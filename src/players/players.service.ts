@@ -7,7 +7,7 @@ export class PlayersService {
   private players = new Map<string, Player>();
 
   register(socket: { id: string }) {
-    const player = new Player(randomUUID(), socket.id);
+    const player = new Player(randomUUID(), socket.id, undefined, 'Marllon');
     this.players.set(socket.id, player);
     return player;
   }

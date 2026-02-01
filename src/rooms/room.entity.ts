@@ -1,10 +1,9 @@
-import { Player } from '../players/player.entity';
-import type { ServerGameState } from '../game/game.state';
+import { ServerGameState } from 'src/game/game.types';
 
 export class Room {
   constructor(
     public readonly id: string,
-    public players: Player[],
+    public players: string[],
     public state: ServerGameState,
     public status: 'WAITING' | 'PLAYING' | 'FINISHED' = 'WAITING',
   ) {}

@@ -18,7 +18,7 @@ export class GameService {
     room.state = GameReducer.apply(room.state, action);
 
     for (const p of room.players) {
-      const clientState = GamePresenter.toClientState(room.state, p.id);
+      const clientState = GamePresenter.toClientState(room.state, p);
       // socket emit (iremos ligar depois)
     }
   }

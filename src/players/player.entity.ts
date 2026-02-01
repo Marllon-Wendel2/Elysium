@@ -3,5 +3,6 @@ export class Player {
     public readonly id: string,
     public socketId: string,
     public roomId?: string,
+    public name?: string,
   ) {}
 }
