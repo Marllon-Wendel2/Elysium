@@ -49,13 +49,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('CREATE_ROOM')
-  handleCreateRoom(@ConnectedSocket() socket: Socket) {
-    const room = this.roomsService.createRoom({});
+  async handleCreateRoom(@ConnectedSocket() socket: Socket) {
     const player = this.playersService.getBySocket(socket.id);
     if (!player) return;
 
-    room.players.push(player.id);
+    const room = await this.roomsService.createRoom(player.id);
 
+    void socket.join(room.id);
     socket.emit('ROOM_CREATED', room);
   }
 
@@ -71,7 +71,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player = this.playersService.getBySocket(socket.id);
     if (!player) return;
 
-    room.players.push(player.id);
     socket.emit('ROOM_JOINED', room);
   }
 }

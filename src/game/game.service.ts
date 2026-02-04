@@ -13,13 +13,13 @@ export class GameService {
     const room = this.roomsService.get(player.roomId!);
     if (!room) return;
 
-    if (!GameRules.canExecute(room.state, action)) return;
+    // if (!GameRules.canExecute(room.state, action)) return;
 
-    room.state = GameReducer.apply(room.state, action);
+    // room.state = GameReducer.apply(room.state, action);
 
-    for (const p of room.players) {
-      const clientState = GamePresenter.toClientState(room.state, p);
-      // socket emit (iremos ligar depois)
-    }
+    // for (const p of room.players) {
+    //   const clientState = GamePresenter.toClientState(room.state, p);
+    //   // socket emit (iremos ligar depois)
+    // }
   }
 }
