@@ -19,4 +19,13 @@ export class PlayersService {
   getBySocket(socketId: string) {
     return this.players.get(socketId);
   }
+
+  getById(playerId: string): Player | undefined {
+    for (const player of this.players.values()) {
+      if (player.id === playerId) {
+        return player;
+      }
+    }
+    return undefined;
+  }
 }

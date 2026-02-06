@@ -1,14 +1,14 @@
 export interface ServerGameState {
-  phase: 'MENU' | 'PLAYING' | 'GAME_OVER';
-  currentTurn: 'PLAYER' | 'CPU';
+  phase: 'PLAYING' | 'FINISHED' | 'WAITING';
+  currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
 
   board: BoardState;
 
-  player: PlayerState;
-  inimyPlayer: PlayerState;
+  playerOne: PlayerState;
+  playerTwo: PlayerState;
 
   turn: number;
-  winner: 'PLAYER' | 'CPU' | 'NONE' | 'DRAW';
+  winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
   showInfos: boolean;
 }
 
@@ -19,15 +19,15 @@ interface BoardState {
 interface BoardSlot {
   lane: 0 | 1 | 2;
   position: Position;
-  owner: 'PLAYER' | 'CPU';
+  owner: 'PLAYERONE' | 'PLAYERTWO';
   card?: Card;
 }
 
 type Position = 'FRONT' | 'BACK';
 
 interface PlayerState {
-  hand: Card[] | number;
-  deck: number;
+  hand: Card[];
+  deck: Card[];
   victoryPoints: number;
   totalMana: number;
   manaAvailable: number;
@@ -53,4 +53,29 @@ interface Card {
 interface CardEffect {
   type: 'DAMAGE' | 'HEAL' | 'DRAW' | 'BUFF' | 'DEBUFF';
   value: number;
+}
+
+export interface PlayerGameView {
+  phase: 'PLAYING' | 'FINISHED' | 'WAITING';
+  currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
+
+  board: BoardState;
+
+  you: {
+    hand: Card[];
+    deckCount: number;
+    victoryPoints: number;
+    totalMana: number;
+    manaAvailable: number;
+  };
+
+  opponent: {
+    handCount: number;
+    deckCount: number;
+    victoryPoints: number;
+    board: BoardState;
+  };
+
+  turn: number;
+  winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
 }

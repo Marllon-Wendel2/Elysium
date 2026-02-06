@@ -1,23 +1,22 @@
 import { ServerGameState } from './game.types';
 
 export const initialState: ServerGameState = {
-  phase: 'MENU',
-  currentTurn: 'PLAYER',
+  phase: 'WAITING',
+  currentTurn: 'NONE',
 
   board: {
     slots: [],
   },
-
-  player: {
+  playerOne: {
     hand: [],
-    deck: 0,
+    deck: [],
     victoryPoints: 0,
     totalMana: 0,
     manaAvailable: 0,
   },
-  inimyPlayer: {
+  playerTwo: {
     hand: [],
-    deck: 0,
+    deck: [],
     victoryPoints: 0,
     totalMana: 0,
     manaAvailable: 0,
