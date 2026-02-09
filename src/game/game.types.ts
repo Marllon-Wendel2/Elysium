@@ -1,11 +1,18 @@
+import { Card } from 'src/cards/cards.type';
+
 export interface ServerGameState {
-  phase: 'PLAYING' | 'FINISHED' | 'WAITING';
+  phase: 'PLAYING' | 'FINISHED' | 'WAITING' | 'SETUP';
   currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
 
   board: BoardState;
 
   playerOne: PlayerState;
   playerTwo: PlayerState;
+
+  slotChoices?: {
+    PLAYERONE?: SlotChoice;
+    PLAYERTWO?: SlotChoice;
+  };
 
   turn: number;
   winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
@@ -16,8 +23,13 @@ interface BoardState {
   slots: BoardSlot[];
 }
 
-interface BoardSlot {
-  lane: 0 | 1 | 2;
+export interface SlotChoice {
+  front: number;
+  back: number;
+}
+
+export interface BoardSlot {
+  lane: number;
   position: Position;
   owner: 'PLAYERONE' | 'PLAYERTWO';
   card?: Card;
@@ -33,30 +45,8 @@ interface PlayerState {
   manaAvailable: number;
 }
 
-interface Card {
-  id?: string;
-  name: string;
-  mana: number;
-  energy: number;
-  energyUsend: number;
-  class: string;
-  attack: number;
-  life: number;
-  art: string;
-  range: number;
-  canAttack: boolean;
-  canEvolve: boolean;
-  effect?: CardEffect;
-  apend: Card[];
-}
-
-interface CardEffect {
-  type: 'DAMAGE' | 'HEAL' | 'DRAW' | 'BUFF' | 'DEBUFF';
-  value: number;
-}
-
 export interface PlayerGameView {
-  phase: 'PLAYING' | 'FINISHED' | 'WAITING';
+  phase: 'PLAYING' | 'FINISHED' | 'WAITING' | 'SETUP';
   currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
 
   board: BoardState;

@@ -11,7 +11,6 @@ import { Server, Socket } from 'socket.io';
 import { PlayersService } from '../players/players.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { GameService } from '../game/game.service';
-import type { ClientToServerEvent } from './game.events';
 import { NotFoundException } from '@nestjs/common';
 
 @WebSocketGateway(3002, {
@@ -100,11 +99,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (!playerOne || !playerTwo) return;
 
-      const viewP1 = this.gameService.createPlayerView(room.state, 'PLAYERONE');
-      const viewP2 = this.gameService.createPlayerView(room.state, 'PLAYERTWO');
+      this.server.to(playerOne.socketId).emit('SLOT_CHOICE');
+      this.server.to(playerTwo.socketId).emit('SLOT_CHOICE');
 
-      this.server.to(playerOne.socketId).emit('GAME_STATE', viewP1);
-      this.server.to(playerTwo.socketId).emit('GAME_STATE', viewP2);
+      // const viewP1 = this.gameService.createPlayerView(room.state, 'PLAYERONE');
+      // const viewP2 = this.gameService.createPlayerView(room.state, 'PLAYERTWO');
+
+      //   this.server.to(playerOne.socketId).emit('GAME_STATE', viewP1);
+      //   this.server.to(playerTwo.socketId).emit('GAME_STATE', viewP2);
+    }
+  }
+
+  @SubscribeMessage('SUBMIT_SLOTS')
+  async handleSlotChoice(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() slots: { front: number; back: number },
+  ) {
+    const player = this.playersService.getBySocket(socket.id);
+    if (!player) return;
+
+    const room = await this.roomsService.get(player.roomId!);
+    if (!room) return;
+
+    const result = await this.gameService.submitSlotChoice(
+      room,
+      player.id,
+      slots,
+    );
+
+    if (!result.ok) {
+      socket.emit('SETUP_ERROR', result.error);
+      return;
+    }
+
+    socket.emit('SLOTS_CONFIRMED');
+
+    if (result.ready) {
+      this.server.to(room.id).emit('SETUP_FINISHED');
     }
   }
 }

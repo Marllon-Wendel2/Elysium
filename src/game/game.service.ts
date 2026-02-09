@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { GameRules } from './game.rules';
-import { GameReducer } from './game.reducer';
-import { GamePresenter } from './game.presenter';
 import { RoomsService } from '../rooms/rooms.service';
-import { Player } from '../players/player.entity';
-import { PlayerGameView, ServerGameState } from './game.types';
+import {
+  BoardSlot,
+  PlayerGameView,
+  ServerGameState,
+  SlotChoice,
+} from './game.types';
+import { Room } from 'src/rooms/room.entity';
 
 @Injectable()
 export class GameService {
@@ -55,5 +58,84 @@ export class GameService {
       turn: state.turn,
       winner: state.winner,
     };
+  }
+
+  async submitSlotChoice(
+    room: Room,
+    playerId: string,
+    slots: { front: number; back: number },
+  ): Promise<{ ok: boolean; ready?: boolean; error?: string }> {
+    if (room.state.phase !== 'SETUP') {
+      return { ok: false, error: 'INVALID_PHASE' };
+    }
+
+    const valid = GameRules.isValidSlotChoice(slots.front, slots.back, 5);
+    if (!valid) {
+      return { ok: false, error: 'INVALID_SLOT_CHOICE' };
+    }
+
+    const side =
+      room.players.find((p) => p.id === playerId)?.player === 'PLAYER ONE'
+        ? 'PLAYERONE'
+        : 'PLAYERTWO';
+
+    room.state.slotChoices ??= {};
+    room.state.slotChoices[side] = slots;
+
+    const ready =
+      room.state.slotChoices.PLAYERONE && room.state.slotChoices.PLAYERTWO;
+
+    const choices = room.state.slotChoices;
+
+    if (!choices?.PLAYERONE || !choices?.PLAYERTWO) {
+      return { ok: false, error: 'SLOT_CHOICES_INCOMPLETE' };
+    }
+
+    room.state.board.slots = this.createBoardFromSlotChoices(
+      choices.PLAYERONE,
+      choices.PLAYERTWO,
+    );
+
+    await this.roomsService.updateRoom(room);
+
+    return { ok: true, ready: Boolean(ready) };
+  }
+
+  createBoardFromSlotChoices(p1: SlotChoice, p2: SlotChoice): BoardSlot[] {
+    const slots: BoardSlot[] = [];
+
+    for (let i = 0; i < p1.front; i++) {
+      slots.push({
+        lane: i,
+        position: 'FRONT',
+        owner: 'PLAYERONE',
+      });
+    }
+
+    for (let i = 0; i < p1.back; i++) {
+      slots.push({
+        lane: i,
+        position: 'BACK',
+        owner: 'PLAYERONE',
+      });
+    }
+
+    for (let i = 0; i < p2.front; i++) {
+      slots.push({
+        lane: i,
+        position: 'FRONT',
+        owner: 'PLAYERTWO',
+      });
+    }
+
+    for (let i = 0; i < p2.back; i++) {
+      slots.push({
+        lane: i,
+        position: 'BACK',
+        owner: 'PLAYERTWO',
+      });
+    }
+
+    return slots;
   }
 }
