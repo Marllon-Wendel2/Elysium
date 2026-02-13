@@ -6,12 +6,16 @@ import { GameService } from './game/game.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './infra/redis/redis.module';
+import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     RedisModule,
-    MongooseModule.forRoot(process.env.MONGO_STRING as string),
+    MongooseModule.forRoot(process.env.MONGO_STRING as string, {
+      dbName: 'card-game',
+    }),
+    CardsModule,
   ],
   providers: [GameGateway, PlayersService, RoomsService, GameService],
 })

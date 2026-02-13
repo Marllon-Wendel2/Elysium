@@ -2,7 +2,6 @@ export type Rarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
 export interface Card {
   id: string;
-  templateId: string;
   name: string;
   mana: number;
   energy: number;
