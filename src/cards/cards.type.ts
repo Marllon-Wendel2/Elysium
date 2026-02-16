@@ -16,10 +16,20 @@ export interface Card {
   canEvolve: boolean;
   effect?: CardEffect;
   attachments: Card[];
+  ability: Ability[];
   description: string;
 }
 
 interface CardEffect {
   type: 'DAMAGE' | 'HEAL' | 'DRAW' | 'BUFF' | 'DEBUFF';
   value: number;
+}
+
+interface Ability {
+  trigger: string;
+  effect: 'CREATE' | 'APPLYSTATUS';
+  params?: {
+    cardId: string;
+    zone: string;
+  };
 }

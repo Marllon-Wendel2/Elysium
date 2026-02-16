@@ -1,0 +1,594 @@
+[
+    {
+        "name": "A escolha",
+        "mana": 2,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1GnBXvsM4E9MVFXhhBwt4VwEmDwwips9U/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 10
+        },
+        "description": "Concede +10 de vida ou escudo para um alvo aliado."
+    },
+    {
+        "name": "Espada de madeira",
+        "mana": null,
+        "energy": 2,
+        "class": "weapon",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1xbAJTlYP1LCLu74sUPCDWKTZFUvvUz64/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 5
+        },
+        "description": "Aumenta o ataque do portador em +5."
+    },
+    {
+        "name": "Menino gentil",
+        "mana": 2,
+        "energy": 1,
+        "attack": 10,
+        "life": 10,
+        "class": "citizen",
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1701twx82PcDSwbzavwRONdToaymKAst4/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DRAW",
+            "value": 1
+        },
+        "description": "Ao ser invocado, puxe 1 carta."
+    },
+    {
+        "name": "Oração",
+        "mana": 5,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1u1sQpH-lDnOm5-HSkik3x3tZxaxfZvRq/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DRAW",
+            "value": 2
+        },
+        "description": "Suplique proteção aos deuses. Puxe 2 cartas do seu deck."
+    },
+    {
+        "name": "Milagre",
+        "mana": 6,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1odgkyby9IYkhmpYzj_uIN1SRaVXsNAsc/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "HEAL",
+            "value": 20
+        },
+        "description": "Um milagre acontece. Restaura 20 de vida de um aliado."
+    },
+    {
+        "name": "Sacrifício",
+        "mana": 3,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1hVdQpoFqgRPuw_mrIuqGjhP0uDhZA9Wd/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 15
+        },
+        "description": "Sacrifica recursos para fortalecer um aliado com +15 de ataque."
+    },
+    {
+        "name": "Helena, Cartomante",
+        "mana": 4,
+        "energy": 2,
+        "class": "citizen",
+        "attack": 10,
+        "life": 20,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1pvfqVUu-eG7TRgI1ExiWzUig3Dy4WTbB/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DRAW",
+            "value": 1
+        },
+        "description": "Helena prevê o futuro. Puxe 1 carta ao invocar."
+    },
+    {
+        "name": "Helena, Curandeira",
+        "mana": 5,
+        "energy": 2,
+        "class": "citizen",
+        "attack": 10,
+        "life": 30,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1feQ3roeDyevlxbhWxxdoJwuYsqrwt9Ly/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DEBUFF",
+            "value": 10
+        },
+        "description": "Enfraquece um inimigo, reduzindo seu ataque em 10."
+    },
+    {
+        "name": "Benção da santa",
+        "mana": 4,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1rbryKM742AAPEY91eCE_-4vujLP6Vc0O/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 10
+        },
+        "description": "Abençoa um aliado, aumentando sua vida máxima em 10."
+    },
+    {
+        "name": "Espada divina",
+        "mana": 2,
+        "energy": 4,
+        "class": "weapon",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/14owll4eAXo7pZz_saf0onyj-_GBvjvj5/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "HEAL",
+            "value": 15
+        },
+        "description": "Ao ser equipada, cura o portador em 15 pontos de vida."
+    },
+    {
+        "name": "Cortesã",
+        "mana": 3,
+        "energy": 2,
+        "class": "citizen",
+        "attack": 5,
+        "life": 15,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1kqbQFnyalN5BHGY4PF4KjkH3QIiOOx10/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "HEAL",
+            "value": 10
+        },
+        "description": "Ao ser invocada, cura um aliado ou o jogador em 10."
+    },
+    {
+        "name": "Soldado iniciado",
+        "mana": 3,
+        "energy": 3,
+        "class": "army",
+        "attack": 20,
+        "life": 25,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1nbHHcxYYb1pRcMsr3goR7NuLFrKnTWBN/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 5
+        },
+        "description": "Recebe +5 de ataque se houver outro soldado em campo."
+    },
+    {
+        "name": "Mulher arrependida",
+        "mana": 6,
+        "energy": 2,
+        "class": "cleric",
+        "attack": 5,
+        "life": 40,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1law_RspU1bIbQHK5Hxsf3-ckkwwspKdH/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "HEAL",
+            "value": 30
+        },
+        "description": "Cura um alvo aliado em 30 pontos de vida."
+    },
+    {
+        "name": "Arthur, o escolhido",
+        "mana": 8,
+        "energy": 8,
+        "class": "noble",
+        "attack": 35,
+        "life": 45,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/12YqPmIeHc39O703QmXOBrnUc-fHMsmh8/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 15
+        },
+        "description": "O protetor corajoso. Ganha +15 de ataque ao entrar em campo."
+    },
+    {
+        "name": "Rajada de luzes",
+        "mana": 5,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1Fy6b6uLOin9XZCzW6ZqNnrc9Ag39fM_0/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DAMAGE",
+            "value": 25
+        },
+        "description": "Causa 25 de dano direto a um inimigo."
+    },
+    {
+        "name": "Heliote, o Principe",
+        "mana": 6,
+        "energy": 4,
+        "class": "noble",
+        "attack": 20,
+        "life": 30,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1PcoFECfbRJgKbfsL7RrxNsGUgOD5fZC6/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DRAW",
+            "value": 2
+        },
+        "description": "Heliote traz recursos. Puxe 2 cartas ao invocar."
+    },
+    {
+        "name": "Conselho de amigo",
+        "mana": 2,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1n3pqfVhtbdR_77iOLXAO7LSHMUv3M-C4/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 10
+        },
+        "description": "Aumenta a defesa/vida de um aliado em 10."
+    },
+    {
+        "name": "Vagando",
+        "mana": 3,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1qmYuZx9m0yXvdGExdM3_vCogQMIDjuHP/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DEBUFF",
+            "value": 20
+        },
+        "description": "Heliote distrai o adversário. Reduz o ataque de um inimigo em 20."
+    },
+    {
+        "name": "Proteção dos fracos",
+        "mana": 4,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1xdv6SLyofxtzahDLWtFOSH0ItWhibpfs/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 20
+        },
+        "description": "Concede um escudo de 20 pontos para um aliado."
+    },
+    {
+        "name": "O homem velho",
+        "mana": 5,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1MAp486OZjMS69z9PZJAF1fAwwJY6GRzs/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DAMAGE",
+            "value": 30
+        },
+        "description": "Causa 30 de dano direto ao alvo inimigo."
+    },
+    {
+        "name": "O homem doente",
+        "mana": 4,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1cKr2ed6-OFukqX_7mRw-p-MrmVu0SLo1/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DEBUFF",
+            "value": 15
+        },
+        "description": "Adoece um inimigo, reduzindo seu ataque em 15."
+    },
+    {
+        "name": "O homem morto",
+        "mana": 8,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/16Y-AasBaHT0-eqEQdfjOmTa-zPtOxVB1/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DAMAGE",
+            "value": 50
+        },
+        "description": "Causa dano massivo (50) a uma carta inimiga."
+    },
+    {
+        "name": "Padeiro",
+        "mana": 3,
+        "energy": 2,
+        "class": "citizen",
+        "attack": 15,
+        "life": 20,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1a96e1C_ihbCUuEIlhwOnkO7zwUfBNi-G/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "HEAL",
+            "value": 10
+        },
+        "description": "Pão quentinho. Cura 10 de vida ao entrar em campo."
+    },
+    {
+        "name": "Pão",
+        "mana": 1,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1j_ol224ZkedIiSOYlsY4UrmqXNqs2l78/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "HEAL",
+            "value": 5
+        },
+        "description": "Recupera 5 de vida."
+    },
+    {
+        "name": "Manteiga",
+        "mana": 1,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1nTigJ7oan1OMod0siwz4VmIzBwKtr2x2/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 5
+        },
+        "description": "Aumenta o ataque de um aliado em 5."
+    },
+    {
+        "name": "Café da manhã",
+        "mana": 3,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/10dGy0PCcYgtoP_H2WXP7dc-B1io0Ogo3/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "HEAL",
+            "value": 25
+        },
+        "description": "Uma refeição completa. Cura 25 de vida."
+    },
+    {
+        "name": "Crianças travessas",
+        "mana": 2,
+        "energy": 1,
+        "class": "citizen",
+        "attack": 5,
+        "life": 10,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/194MxrBChfrYSDlEndRc1_xe-8n-0CcZA/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 10
+        },
+        "description": "Torcendo por você. Aumenta o ataque de um aliado do tipo exército em 10."
+    },
+    {
+        "name": "Marcos - Soldado medroso",
+        "mana": 4,
+        "energy": 4,
+        "class": "army",
+        "attack": 20,
+        "life": 30,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1noXUD8-zPKcyx9Kj2l7Q3EPUrBFIwKyz/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 10
+        },
+        "description": "Ganha +10 de vida se estiver defendendo."
+    },
+    {
+        "name": "Marcos - O HÉROI",
+        "mana": 9,
+        "energy": 9,
+        "class": "noble",
+        "attack": 40,
+        "life": 60,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1X_NKv2cHJm8LQjw9O2zoNwgZtiMQ0OzK/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 20
+        },
+        "description": "Protegendo os fracos. Concede +20 de defesa a todos os aliados enquanto estiver em campo."
+    },
+    {
+        "name": "Aline - Soldada",
+        "mana": 4,
+        "energy": 3,
+        "class": "army",
+        "attack": 25,
+        "life": 20,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1R25AmP8c1gHOxxcuW714-GQXi5VncvKS/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DRAW",
+            "value": 1
+        },
+        "description": "Empolgada. Puxe uma carta ao entrar em campo."
+    },
+    {
+        "name": "Aline - Tenente",
+        "mana": 6,
+        "energy": 6,
+        "class": "army",
+        "attack": 35,
+        "life": 30,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1VGFh1StJ3v-FDDFJO6ZGCA9rMpP3FTFB/view?usp=sharing",
+        "range": 2,
+        "effect": {
+            "type": "DRAW",
+            "value": 1
+        },
+        "description": "FOCADA. Puxe uma carta ao entrar em campo."
+    },
+    {
+        "name": "Irmão da Aline",
+        "mana": 3,
+        "energy": 2,
+        "class": "army",
+        "attack": 10,
+        "life": 15,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1o3fvm2amuj8TjDdq6pGLbYpywsvsbbfI/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 15
+        },
+        "description": "Se a Aline estiver em campo, ele ganha +15 de ataque."
+    },
+    {
+        "name": "A divina",
+        "mana": 7,
+        "energy": 6,
+        "class": "divine",
+        "attack": 30,
+        "life": 45,
+        "rarity": "comum",
+        "artUrl":"https://drive.google.com/file/d/1X2OhgpAVKc0Bd_YJ_mtNKFmKJU4G1OsX/view?usp=sharing",
+        "range": 3,
+        "effect": {
+            "type": "BUFF",
+            "value": null
+        },
+        "description": "No inicia da rodada crie uma rajada de luzes na sua mão."
+    },
+    {
+        "name": "Suprimentos",
+        "mana": 3,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/11tBrgwmcq9Dw1zEDDUc_mSit21kHUX2F/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "DRAW",
+            "value": 3
+        },
+        "description": "Puxe duas cartas do seu deck."
+    },
+    {
+        "name": "Reforços",
+        "mana": 3,
+        "energy": null,
+        "class": "spell",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1SHjeA8VqGAsYWYKdQWGqerCb1sjaPzkJ/view?usp=sharing",
+        "range": null,
+        "effect": {
+            "type": "BUFF",
+            "value": 2
+        },
+        "description": "Chegaram reforços. Copie uma carta do campo. (Temporariamente, dobre seu dano)"
+    },
+    {
+        "name": "Jeremias",
+        "mana": 8,
+        "energy": 5,
+        "class": "cleric",
+        "attack": 10,
+        "life": 50,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1IPC9OiZ1l8FMhqBF1yGEFL5HbQvKtPA0/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "DAMAGE",
+            "value": 10
+        },
+        "description": "Magia santa. Causa 10 de dano a todos os inimigos ao entrar."
+    },
+    {
+        "name": "Arco Divino",
+        "mana": 0,
+        "energy": 7,
+        "class": "weapon",
+        "attack": null,
+        "life": null,
+        "rarity": "comum",
+        "artUrl": "https://drive.google.com/file/d/1jC3rF0FrHmQIYOuXibAJzfsw65imq9w9/view?usp=sharing",
+        "range": 1,
+        "effect": {
+            "type": "BUFF",
+            "value": 20
+        },
+        "description": "Arco santo de luz e raios, aquele que o porta se torna a entendidade das flecas magicas"
+    }
+]

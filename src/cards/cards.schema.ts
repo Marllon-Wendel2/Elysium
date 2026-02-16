@@ -15,9 +15,31 @@ const CardEffectSchema = new mongoose.Schema(
   { _id: false },
 );
 
+export const AbilitySchema = new mongoose.Schema(
+  {
+    trigger: {
+      type: String,
+      enum: ['START_TURN', 'END_TURN'],
+      required: true,
+    },
+    effect: {
+      type: String,
+      enum: ['CREATE', 'APPLYSTATUS'],
+      required: true,
+    },
+    params: {
+      cardId: { type: String },
+      zone: { type: String },
+      status: { type: String },
+      value: { type: Number },
+    },
+  },
+  { _id: false },
+);
+
 export const CardSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     mana: { type: Number, default: 0 },
     class: { type: String, required: true },
     rarity: String,
@@ -33,6 +55,8 @@ export const CardSchema = new mongoose.Schema(
       type: CardEffectSchema,
       default: () => ({}),
     },
+    ability: { type: [AbilitySchema], default: [] },
+    disabled: { type: Boolean, default: false },
   },
   {
     timestamps: true,
