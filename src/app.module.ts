@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './infra/redis/redis.module';
 import { CardsModule } from './cards/cards.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PrismaModule } from './infra/prisma/prisma.module';
     }),
     CardsModule,
     PrismaModule,
+    UsersModule,
   ],
   providers: [GameGateway, PlayersService, RoomsService, GameService],
 })
