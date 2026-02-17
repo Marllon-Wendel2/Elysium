@@ -17,7 +17,7 @@ export class CardsController {
 
   @Post()
   async createMultCard(@Body() createCardDto: CreateCardDto[]) {
-    return this.cardsService.createMultCards(createCardDto);
+    return await this.cardsService.createMultCards(createCardDto);
   }
 
   @Get()

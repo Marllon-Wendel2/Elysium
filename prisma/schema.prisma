@@ -1,0 +1,126 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+    USER
+    ADMIN
+    PLAYER
+}
+
+model User {
+    id           String  @id @default(uuid())
+    firstName    String
+    lastName     String?
+    email        String  @unique
+    isVerified   Boolean @default(false)
+    accessKey    String? @map("key")
+    role         Role    @default(USER)
+    passwordHash String
+    isActive     Boolean @default(true)
+
+    adminProfile  Admin?
+    playerProfile Player?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("users")
+}
+
+model Admin {
+    id                   String    @id @default(uuid())
+    permissionLevel      Int       @default(1)
+    permissionsExpiresAt DateTime?
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @unique
+
+    player   Player? @relation(fields: [playerId], references: [id])
+    playerId String?
+
+    @@map("admins")
+}
+
+model Player {
+    id       String  @id @default(uuid())
+    username String  @unique
+    ranking  Int     @default(0)
+    wins     Int     @default(0)
+    losses   Int     @default(0)
+    isPK     Boolean @default(false)
+    honor    Int     @default(0)
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @unique
+
+    decks Deck[] @relation("Owner")
+
+    selectedDeck   Deck?   @relation("Selected", fields: [selectedDeckId], references: [id])
+    selectedDeckId String?
+
+    adminsLinked Admin[]
+
+    @@map("players")
+}
+
+model Deck {
+    id   String @id @default(uuid())
+    name String
+
+    owner   Player? @relation("Owner", fields: [ownerId], references: [id])
+    ownerId String?
+
+    selectedByPlayers Player[] @relation("Selected")
+
+    cards CardsOnDecks[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("decks")
+}
+
+// Tabela Pivô: Resolve a relação Deck <-> Card
+// Permite ter 3x a mesma carta em um deck, por exemplo.
+model CardsOnDecks {
+    deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+    deckId String
+
+    card   Card   @relation(fields: [cardId], references: [id])
+    cardId String
+
+    quantity Int @default(1) // Quantas cópias desta carta estão no deck
+
+    @@id([deckId, cardId]) // Chave composta para performance
+    @@map("cards_on_decks")
+}
+
+model Card {
+    id          String  @id @default(uuid())
+    name        String  @unique
+    mana        Int     @default(0)
+    class       String
+    rarity      String?
+    artUrl      String?
+    description String?
+    energy      Int?
+    attack      Int?
+    life        Int?
+    range       Int?
+    effect      Json?   @default("{}")
+    ability     Json    @default("[]")
+    disabled    Boolean @default(false)
+
+    decks CardsOnDecks[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("cards")
+}

@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './infra/redis/redis.module';
 import { CardsModule } from './cards/cards.module';
+import { PrismaModule } from './infra/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CardsModule } from './cards/cards.module';
       dbName: 'card-game',
     }),
     CardsModule,
+    PrismaModule,
   ],
   providers: [GameGateway, PlayersService, RoomsService, GameService],
 })
