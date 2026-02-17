@@ -11,7 +11,13 @@ import { Server, Socket } from 'socket.io';
 import { PlayersService } from '../players/players.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { GameService } from '../game/game.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/infra/types';
+
+type AuthenticatedSocket = Socket & {
+  user?: { sub: string; email: string; role: string; firstName: string };
+};
 
 @WebSocketGateway(3002, {
   cors: { origin: '*' },
@@ -24,11 +30,36 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly playersService: PlayersService,
     private readonly roomsService: RoomsService,
     private readonly gameService: GameService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  handleConnection(socket: Socket) {
-    const player = this.playersService.register(socket);
-    console.log(player);
+  async handleConnection(socket: AuthenticatedSocket) {
+    try {
+      const token: string = (socket.handshake.auth?.token ||
+        socket.handshake.headers?.authorization) as string;
+      if (!token) {
+        throw new UnauthorizedException('Token não fornecido');
+      }
+
+      const jwt = token.replace('Bearer ', '');
+
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(jwt, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      console.log(payload);
+
+      socket.user = payload;
+      this.playersService.register(socket.id, payload.sub, payload.firstName);
+
+      console.log(
+        `[CONEXÃO] Usuário ${payload.email} entrou com Socket ID: ${socket.id}`,
+      );
+    } catch (error) {
+      console.log(`[BLOQUEIO] Conexão rejeitada: ${error}`);
+
+      socket.disconnect(true);
+    }
   }
 
   handleDisconnect(socket: Socket) {
@@ -53,7 +84,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // }
 
   @SubscribeMessage('CREATE_ROOM')
-  async handleCreateRoom(@ConnectedSocket() socket: Socket) {
+  async handleCreateRoom(@ConnectedSocket() socket: AuthenticatedSocket) {
+    console.log('chegou aqui');
+
     const player = this.playersService.getBySocket(socket.id);
     if (!player) return;
 
@@ -68,7 +101,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('JOIN_ROOM')
   async handleJoinRoom(
-    @ConnectedSocket() socket: Socket,
+    @ConnectedSocket() socket: AuthenticatedSocket,
     @MessageBody() roomId: string,
   ) {
     const player = this.playersService.getBySocket(socket.id);
@@ -76,6 +109,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const result = await this.roomsService.joinRoom(roomId, player.id);
     if (!result) throw new NotFoundException('Room not found');
+
+    console.log(result);
 
     if ('error' in result) {
       socket.emit('ERROR', result.error);
@@ -87,10 +122,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.emit('ROOM_JOINED');
 
     if (result.ready) {
+      console.log('entrou no if');
       const room = result.room;
+      console.log('room', room);
 
       const p1Id = room.players.find((p) => p.player === 'PLAYER ONE')?.id;
       const p2Id = room.players.find((p) => p.player === 'PLAYER TWO')?.id;
+
+      console.log('p1Id', p1Id);
+      console.log('p2Id', p2Id);
 
       if (!p1Id || !p2Id) return;
 
@@ -98,6 +138,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const playerTwo = this.playersService.getById(p2Id);
 
       if (!playerOne || !playerTwo) return;
+      console.log('playerOne', playerOne);
+      console.log('playerTwo', playerTwo);
 
       this.server.to(playerOne.socketId).emit('SLOT_CHOICE');
       this.server.to(playerTwo.socketId).emit('SLOT_CHOICE');

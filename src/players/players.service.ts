@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Player } from './player.entity';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class PlayersService {
   private players = new Map<string, Player>();
 
-  register(socket: { id: string }) {
-    const player = new Player(randomUUID(), socket.id, undefined, 'Marllon');
-    this.players.set(socket.id, player);
+  register(socketId: string, userId: string, name: string) {
+    const player = new Player(userId, socketId, undefined, name);
+
+    this.players.set(socketId, player);
     return player;
   }
 

@@ -9,6 +9,7 @@ import { RedisModule } from './infra/redis/redis.module';
 import { CardsModule } from './cards/cards.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from './users/users.module';
     CardsModule,
     PrismaModule,
     UsersModule,
+    AuthModule,
   ],
   providers: [GameGateway, PlayersService, RoomsService, GameService],
 })
