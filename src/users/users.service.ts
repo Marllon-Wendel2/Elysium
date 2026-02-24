@@ -7,6 +7,7 @@ import {
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { HashingService } from 'src/infra/hashing/hashing.service';
+import { CreatePlayerDto } from './dto/player.dto';
 
 @Injectable()
 export class UsersService {
@@ -41,7 +42,7 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
-          role: true,
+          roles: true,
           createdAt: true,
         },
       });
@@ -61,7 +62,7 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
-          role: true,
+          roles: true,
           createdAt: true,
         },
       });
@@ -86,7 +87,7 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
-          role: true,
+          roles: true,
           createdAt: true,
         },
       });
@@ -128,7 +129,7 @@ export class UsersService {
           firstName: true,
           lastName: true,
           email: true,
-          role: true,
+          roles: true,
           createdAt: true,
         },
       });
@@ -164,6 +165,62 @@ export class UsersService {
         throw error;
       }
       throw new InternalServerErrorException('Consulte o log do servidor');
+    }
+  }
+
+  async createPlayerProfile(userId: string, dto: CreatePlayerDto) {
+    try {
+      return await this.prismaService.$transaction(async (prisma) => {
+        const player = await prisma.player.create({ data: { userId, ...dto } });
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            roles: {
+              push: 'PLAYER',
+            },
+          },
+        });
+        return player;
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Consulte o log do servidor');
+    }
+  }
+
+  async createAdminProfile(userId: string, permissionLevel: number = 1) {
+    try {
+      return await this.prismaService.$transaction(async (prisma) => {
+        const user = await prisma.user.findFirst({
+          where: { id: userId },
+          include: { playerProfile: true },
+        });
+
+        if (!user) {
+          throw new NotFoundException('Usuário não encontrado');
+        }
+
+        const admin = await prisma.admin.create({
+          data: {
+            userId,
+            permissionLevel,
+          },
+        });
+
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            roles: {
+              push: 'ADMIN',
+            },
+          },
+        });
+
+        return admin;
+      });
+    } catch (error) {
+      console.error('Erro ao promover para Admin', error);
+      throw new InternalServerErrorException('Erro ao promover para Admin');
     }
   }
 }

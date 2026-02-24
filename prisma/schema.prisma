@@ -20,7 +20,7 @@ model User {
     email        String  @unique
     isVerified   Boolean @default(false)
     accessKey    String? @map("key")
-    role         Role    @default(USER)
+    roles        Role[]  @default([USER])
     passwordHash String
     isActive     Boolean @default(true)
 
@@ -86,8 +86,6 @@ model Deck {
     @@map("decks")
 }
 
-// Tabela Pivô: Resolve a relação Deck <-> Card
-// Permite ter 3x a mesma carta em um deck, por exemplo.
 model CardsOnDecks {
     deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
     deckId String

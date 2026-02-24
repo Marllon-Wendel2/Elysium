@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
+import * as playerDto from './dto/player.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +18,19 @@ export class UsersController {
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
+  }
+
+  @Post(':userId/players')
+  createPlayerProfile(
+    @Param('userId') userId: string,
+    @Body() createPlayerDto: playerDto.CreatePlayerDto,
+  ) {
+    return this.usersService.createPlayerProfile(userId, createPlayerDto);
+  }
+
+  @Post(':userId/admins')
+  createAdminProfile(@Param('userId') userId: string) {
+    return this.usersService.createAdminProfile(userId);
   }
 
   @Get()
