@@ -14,22 +14,18 @@ export interface Card {
   range: number;
   canAttack: boolean;
   canEvolve: boolean;
-  effect?: CardEffect;
   attachments: Card[];
-  ability: Ability[];
+  abilities: Ability[];
   description: string;
-}
-
-interface CardEffect {
-  type: 'DAMAGE' | 'HEAL' | 'DRAW' | 'BUFF' | 'DEBUFF';
-  value: number;
-}
-
-interface Ability {
-  trigger: string;
-  effect: 'CREATE' | 'APPLYSTATUS';
-  params?: {
-    cardId: string;
-    zone: string;
+  status?: {
+    movementLocked?: boolean;
+    silenced?: boolean;
   };
+}
+
+export interface Ability {
+  key: string;
+  name: string;
+  description: string;
+  trigger: 'ON_PLAY' | 'START_TURN' | 'END_TURN' | 'PASSIVE';
 }

@@ -16,7 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/infra/types';
 
 type AuthenticatedSocket = Socket & {
-  user?: { sub: string; email: string; role: string; firstName: string };
+  user?: { sub: string; email: string; roles: string; firstName: string };
 };
 
 @WebSocketGateway(3002, {

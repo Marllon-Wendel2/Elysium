@@ -6,16 +6,22 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './cards.dto';
 import type { UpdateCardDto } from './cards.dto';
+import { RolesGuard } from 'src/auth/guards/roles.guards';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Post()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   async createMultCard(@Body() createCardDto: CreateCardDto[]) {
     return await this.cardsService.createMultCards(createCardDto);
   }

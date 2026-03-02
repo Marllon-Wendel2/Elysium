@@ -37,7 +37,6 @@ export class GameService {
 
     return {
       phase: state.phase,
-      currentTurn: state.currentTurn,
       board: state.board,
 
       you: {

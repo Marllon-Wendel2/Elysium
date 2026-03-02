@@ -18,8 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       userId: payload.sub,
       email: payload.email,
-      role: payload.role,
       firstName: payload.firstName,
+      roles: Array.isArray(payload.roles) ? payload.roles : [payload.roles],
     };
   }
 }

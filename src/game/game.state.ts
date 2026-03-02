@@ -2,7 +2,12 @@ import { ServerGameState } from './game.types';
 
 export const initialState: ServerGameState = {
   phase: 'WAITING',
-  currentTurn: 'NONE',
+  turn: 0,
+
+  pendingActions: {
+    PLAYERONE: [],
+    PLAYERTWO: [],
+  },
 
   board: {
     slots: [],
@@ -22,7 +27,6 @@ export const initialState: ServerGameState = {
     manaAvailable: 0,
   },
 
-  turn: 0,
   winner: 'NONE',
   showInfos: false,
 };

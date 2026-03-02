@@ -71,8 +71,8 @@ export class RoomsService {
 
     if (ready) {
       room.status = 'PLAYING';
-      room.state.phase = 'PLAYING';
-      room.state.currentTurn = 'PLAYERONE';
+      room.state.turn = 1;
+      room.state.phase = 'SETUP';
 
       await this.updateRoom(room);
     }

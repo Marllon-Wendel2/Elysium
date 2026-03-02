@@ -1,8 +1,21 @@
 import { Card } from 'src/cards/cards.type';
 
+export type GamePhase =
+  | 'WAITING'
+  | 'SETUP'
+  | 'STANDBY'
+  | 'DECLARATION'
+  | 'RESOLUTION'
+  | 'FINISHED';
+
 export interface ServerGameState {
-  phase: 'PLAYING' | 'FINISHED' | 'WAITING' | 'SETUP';
-  currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
+  phase: GamePhase;
+  turn: number;
+
+  pendingActions: {
+    PLAYERONE: PlayerAction[];
+    PLAYERTWO: PlayerAction[];
+  };
 
   board: BoardState;
 
@@ -14,9 +27,16 @@ export interface ServerGameState {
     PLAYERTWO?: SlotChoice;
   };
 
-  turn: number;
   winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
   showInfos: boolean;
+}
+
+export interface PlayerAction {
+  type: 'CAST_SPELL' | 'ACTIVATE_ABILITY' | 'MOVE' | 'ATTACK';
+  sourceCardId: string;
+  targetId?: string;
+  abilityKey?: string;
+  slotIndex?: number;
 }
 
 interface BoardState {
@@ -46,8 +66,8 @@ interface PlayerState {
 }
 
 export interface PlayerGameView {
-  phase: 'PLAYING' | 'FINISHED' | 'WAITING' | 'SETUP';
-  currentTurn: 'PLAYERONE' | 'PLAYERTWO' | 'NONE';
+  phase: GamePhase;
+  turn: number;
 
   board: BoardState;
 
@@ -65,7 +85,5 @@ export interface PlayerGameView {
     victoryPoints: number;
     board: BoardState;
   };
-
-  turn: number;
   winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
 }
