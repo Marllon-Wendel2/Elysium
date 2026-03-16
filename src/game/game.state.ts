@@ -9,22 +9,29 @@ export const initialState: ServerGameState = {
     PLAYERTWO: [],
   },
 
+  slotChoices: {
+    PLAYERONE: null,
+    PLAYERTWO: null,
+  },
+
   board: {
     slots: [],
   },
   playerOne: {
     hand: [],
     deck: [],
+    graveyard: [],
     victoryPoints: 0,
     totalMana: 0,
-    manaAvailable: 0,
+    availableMana: 0,
   },
   playerTwo: {
     hand: [],
     deck: [],
+    graveyard: [],
     victoryPoints: 0,
     totalMana: 0,
-    manaAvailable: 0,
+    availableMana: 0,
   },
 
   winner: 'NONE',

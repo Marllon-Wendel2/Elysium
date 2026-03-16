@@ -122,15 +122,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.emit('ROOM_JOINED');
 
     if (result.ready) {
-      console.log('entrou no if');
       const room = result.room;
       console.log('room', room);
 
       const p1Id = room.players.find((p) => p.player === 'PLAYER ONE')?.id;
       const p2Id = room.players.find((p) => p.player === 'PLAYER TWO')?.id;
-
-      console.log('p1Id', p1Id);
-      console.log('p2Id', p2Id);
 
       if (!p1Id || !p2Id) return;
 
@@ -143,12 +139,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       this.server.to(playerOne.socketId).emit('SLOT_CHOICE');
       this.server.to(playerTwo.socketId).emit('SLOT_CHOICE');
-
-      // const viewP1 = this.gameService.createPlayerView(room.state, 'PLAYERONE');
-      // const viewP2 = this.gameService.createPlayerView(room.state, 'PLAYERTWO');
-
-      //   this.server.to(playerOne.socketId).emit('GAME_STATE', viewP1);
-      //   this.server.to(playerTwo.socketId).emit('GAME_STATE', viewP2);
     }
   }
 

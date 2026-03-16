@@ -1,31 +1,40 @@
-export type Rarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+export interface CardInstance {
+  instanceId: string;
+  templateId: string;
 
-export interface Card {
-  id: string;
-  name: string;
-  mana: number;
-  energy: number;
-  energyUsed: number;
-  class: string;
-  attack: number;
-  life: number;
-  rarity: Rarity;
-  artUrl: string;
-  range: number;
+  ownerId: string;
+  currentLife: number;
+  currentAttack: number;
+  currentEnergy: number;
+
+  position?: number;
+  status: StatusState;
+
   canAttack: boolean;
-  canEvolve: boolean;
-  attachments: Card[];
-  abilities: Ability[];
-  description: string;
-  status?: {
-    movementLocked?: boolean;
-    silenced?: boolean;
-  };
+  canMove: boolean;
 }
 
-export interface Ability {
-  key: string;
-  name: string;
-  description: string;
-  trigger: 'ON_PLAY' | 'START_TURN' | 'END_TURN' | 'PASSIVE';
+export interface StatusState {
+  burn?: number;
+  frozen?: number;
+  stun?: number;
+  marked?: number;
+}
+
+export interface WarriorInstance extends CardInstance {
+  currentLife: number;
+  currentAttack: number;
+
+  baseMana: number;
+  currentMana: number;
+
+  baseEnergy: number;
+  currentEnergy: number;
+  energyUsed: number;
+
+  equipments: string[];
+}
+
+export interface EquipmentInstance extends CardInstance {
+  attachedTo: string; // warrior instanceId
 }

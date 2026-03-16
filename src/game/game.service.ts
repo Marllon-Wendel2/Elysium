@@ -44,7 +44,7 @@ export class GameService {
         deckCount: me.deck.length,
         victoryPoints: me.victoryPoints,
         totalMana: me.totalMana,
-        manaAvailable: me.manaAvailable,
+        manaAvailable: me.availableMana,
       },
 
       opponent: {
@@ -65,10 +65,11 @@ export class GameService {
     slots: { front: number; back: number },
   ): Promise<{ ok: boolean; ready?: boolean; error?: string }> {
     if (room.state.phase !== 'SETUP') {
+      console.log('phase', room.state.phase);
       return { ok: false, error: 'INVALID_PHASE' };
     }
 
-    const valid = GameRules.isValidSlotChoice(slots.front, slots.back, 5);
+    const valid = GameRules.isValidSlotChoice(slots.front, slots.back, 10);
     if (!valid) {
       return { ok: false, error: 'INVALID_SLOT_CHOICE' };
     }
@@ -84,16 +85,14 @@ export class GameService {
     const ready =
       room.state.slotChoices.PLAYERONE && room.state.slotChoices.PLAYERTWO;
 
-    const choices = room.state.slotChoices;
-
-    if (!choices?.PLAYERONE || !choices?.PLAYERTWO) {
-      return { ok: false, error: 'SLOT_CHOICES_INCOMPLETE' };
+    if (ready) {
+      const choices = room.state.slotChoices;
+      room.state.board.slots = this.createBoardFromSlotChoices(
+        choices.PLAYERONE!,
+        choices.PLAYERTWO!,
+      );
+      room.state.phase = 'STANDBY';
     }
-
-    room.state.board.slots = this.createBoardFromSlotChoices(
-      choices.PLAYERONE,
-      choices.PLAYERTWO,
-    );
 
     await this.roomsService.updateRoom(room);
 

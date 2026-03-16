@@ -3,6 +3,7 @@ import { Room } from './room.entity';
 import { randomUUID } from 'crypto';
 import { initialState } from 'src/game/game.state';
 import Redis from 'ioredis';
+import { PlayersService } from 'src/players/players.service';
 
 type JoinRoomResult =
   | { error: 'ROOM_FULL' }
@@ -16,6 +17,7 @@ export class RoomsService {
   constructor(
     @Inject('REDIS_CLIENT')
     private readonly redis: Redis,
+    private readonly playersService: PlayersService,
   ) {}
 
   async createRoom(playerId: string): Promise<string> {
@@ -64,6 +66,11 @@ export class RoomsService {
     }
 
     room.players.push({ player: 'PLAYER TWO', id: playerId });
+
+    const player = this.playersService.getById(playerId);
+    if (player) {
+      player.roomId = roomId;
+    }
 
     await this.updateRoom(room);
 

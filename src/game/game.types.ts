@@ -1,5 +1,3 @@
-import { Card } from 'src/cards/cards.type';
-
 export type GamePhase =
   | 'WAITING'
   | 'SETUP'
@@ -23,8 +21,8 @@ export interface ServerGameState {
   playerTwo: PlayerState;
 
   slotChoices?: {
-    PLAYERONE?: SlotChoice;
-    PLAYERTWO?: SlotChoice;
+    PLAYERONE?: SlotChoice | null;
+    PLAYERTWO?: SlotChoice | null;
   };
 
   winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
@@ -52,17 +50,18 @@ export interface BoardSlot {
   lane: number;
   position: Position;
   owner: 'PLAYERONE' | 'PLAYERTWO';
-  card?: Card;
+  cardInstanceId?: string;
 }
 
 type Position = 'FRONT' | 'BACK';
 
 interface PlayerState {
-  hand: Card[];
-  deck: Card[];
+  hand: string[];
+  deck: string[];
+  graveyard: string[];
   victoryPoints: number;
   totalMana: number;
-  manaAvailable: number;
+  availableMana: number;
 }
 
 export interface PlayerGameView {
@@ -72,7 +71,7 @@ export interface PlayerGameView {
   board: BoardState;
 
   you: {
-    hand: Card[];
+    hand: string[];
     deckCount: number;
     victoryPoints: number;
     totalMana: number;

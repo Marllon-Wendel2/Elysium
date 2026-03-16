@@ -102,23 +102,30 @@ model CardsOnDecks {
 model Card {
     id          String  @id @default(uuid())
     name        String  @unique
+    type        String
     mana        Int     @default(0)
     class       String
     rarity      String?
     artUrl      String?
     description String?
-    energy      Int?
-    attack      Int?
-    life        Int?
-    range       Int?
-    effect      Json?   @default("{}")
-    ability     Json    @default("[]")
-    disabled    Boolean @default(false)
 
-    decks CardsOnDecks[]
+    energy Int?
+    attack Int?
+    life   Int?
+    range  Int?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    effect  Json? @default("{}")
+    ability Json  @default("[]")
+
+    evolvesFromId String?
+    evolvesFrom   Card?   @relation("Evolution", fields: [evolvesFromId], references: [id])
+    evolvesTo     Card[]  @relation("Evolution")
+
+    disabled Boolean @default(false)
+
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    cardsOnDecks CardsOnDecks[]
 
     @@map("cards")
 }

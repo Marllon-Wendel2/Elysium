@@ -1,12 +1,15 @@
 import { z } from 'zod';
 
-const CARD_CLASSES = ['spell', 'unit', 'equip'] as const;
+const CARD_TYPES = ['spell', 'unit', 'equip'] as const;
 
 const EFFECT_TYPES = ['DAMAGE', 'HEAL', 'DRAW', 'BUFF', 'DEBUFF'] as const;
 
+const TRIGGERS = ['START_TURN', 'END_TURN'] as const;
+const ABILITY_EFFECTS = ['CREATE', 'APPLYSTATUS'] as const;
+
 const AbilitySchemaDto = z.object({
-  trigger: z.enum(['START_TURN', 'END_TURN']),
-  effect: z.enum(['CREATE', 'APPLYSTATUS']),
+  trigger: z.enum(TRIGGERS),
+  effect: z.enum(ABILITY_EFFECTS),
   params: z
     .object({
       cardId: z.string().optional(),
@@ -19,8 +22,13 @@ const AbilitySchemaDto = z.object({
 
 export const CardDtoSchema = z.object({
   name: z.string().min(1, { message: 'Nome não pode ser vazio' }),
+
+  type: z.enum(CARD_TYPES),
+
   mana: z.number().min(0).default(0),
-  class: z.enum(CARD_CLASSES),
+
+  class: z.string(),
+
   energy: z.number().nullable().optional(),
   attack: z.number().nullable().optional(),
   life: z.number().nullable().optional(),
@@ -28,6 +36,7 @@ export const CardDtoSchema = z.object({
 
   rarity: z.string().optional(),
   artUrl: z.string().url().optional(),
+  description: z.string().optional(),
 
   effect: z
     .object({
@@ -36,13 +45,15 @@ export const CardDtoSchema = z.object({
     })
     .optional()
     .default({}),
-  ability: AbilitySchemaDto.array().optional(),
-  description: z.string().optional(),
-  disable: z.boolean().default(false),
+
+  // ⚠ Prisma tem Json obrigatório com default "[]"
+  ability: AbilitySchemaDto.array().default([]),
+
+  // ⚠ Nome corrigido
+  disabled: z.boolean().default(false),
 });
 
 export type CreateCardDto = z.infer<typeof CardDtoSchema>;
 
-const UpdateSchema = CardDtoSchema.partial();
-
-export type UpdateCardDto = z.infer<typeof UpdateSchema>;
+export const UpdateCardDtoSchema = CardDtoSchema.partial();
+export type UpdateCardDto = z.infer<typeof UpdateCardDtoSchema>;
