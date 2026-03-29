@@ -1,15 +1,14 @@
 import { z } from 'zod';
 
-const CARD_TYPES = ['spell', 'unit', 'equip'] as const;
+const CARD_TYPES = ['SPELL', 'UNIT', 'EQUIP'] as const;
 
 const EFFECT_TYPES = ['DAMAGE', 'HEAL', 'DRAW', 'BUFF', 'DEBUFF'] as const;
 
-const TRIGGERS = ['START_TURN', 'END_TURN'] as const;
-const ABILITY_EFFECTS = ['CREATE', 'APPLYSTATUS'] as const;
+const TRIGGERS = ['START_TURN', 'END_TURN', 'ON_INVOCATION', 'ON_DIE'] as const;
 
 const AbilitySchemaDto = z.object({
   trigger: z.enum(TRIGGERS),
-  effect: z.enum(ABILITY_EFFECTS),
+  effect: z.string(),
   params: z
     .object({
       cardId: z.string().optional(),
@@ -46,10 +45,8 @@ export const CardDtoSchema = z.object({
     .optional()
     .default({}),
 
-  // ⚠ Prisma tem Json obrigatório com default "[]"
   ability: AbilitySchemaDto.array().default([]),
 
-  // ⚠ Nome corrigido
   disabled: z.boolean().default(false),
 });
 

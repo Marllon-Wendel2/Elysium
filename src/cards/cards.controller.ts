@@ -9,8 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
-import { CreateCardDto } from './cards.dto';
-import type { UpdateCardDto } from './cards.dto';
+import { CreateCardDto } from './dtos/cards.dto';
+import type { UpdateCardDto } from './dtos/cards.dto';
 import { RolesGuard } from 'src/auth/guards/roles.guards';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { AuthGuard } from '@nestjs/passport';

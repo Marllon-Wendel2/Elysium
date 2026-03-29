@@ -10,6 +10,7 @@ import { CardsModule } from './cards/cards.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { DeckModule } from './deck/deck.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     UsersModule,
     AuthModule,
+    DeckModule,
   ],
   providers: [GameGateway, PlayersService, RoomsService, GameService],
 })

@@ -83,6 +83,8 @@ model Deck {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    isSystem Boolean @default(false)
+
     @@map("decks")
 }
 
@@ -93,9 +95,9 @@ model CardsOnDecks {
     card   Card   @relation(fields: [cardId], references: [id])
     cardId String
 
-    quantity Int @default(1) // Quantas cópias desta carta estão no deck
+    quantity Int @default(1)
 
-    @@id([deckId, cardId]) // Chave composta para performance
+    @@id([deckId, cardId])
     @@map("cards_on_decks")
 }
 

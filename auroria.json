@@ -1,35 +1,35 @@
 [
     {
         "name": "A escolha",
+        "type": "SPEEL",
         "mana": 2,
-        "energy": null,
         "class": "spell",
-        "attack": null,
-        "life": null,
+        "energy": 0,
+        "attack": 0,
+        "life": 0,
+        "range": 0,
         "rarity": "comum",
         "artUrl": "https://drive.google.com/file/d/1GnBXvsM4E9MVFXhhBwt4VwEmDwwips9U/view?usp=sharing",
-        "range": null,
-        "effect": {
-            "type": "BUFF",
-            "value": 10
-        },
-        "description": "Concede +10 de vida ou escudo para um alvo aliado."
+        "description": "Proteja um aliado, se ele tiver uma evolução, busque-a do baralho.",
+        "effect": {},
+        "ability": "aEscolha"
+
+        criado
     },
     {
         "name": "Espada de madeira",
-        "mana": null,
+        "mana": 0,
         "energy": 2,
         "class": "weapon",
-        "attack": null,
-        "life": null,
+        "attack": 2,
+        "life": 0,
         "rarity": "comum",
         "artUrl": "https://drive.google.com/file/d/1xbAJTlYP1LCLu74sUPCDWKTZFUvvUz64/view?usp=sharing",
-        "range": 1,
-        "effect": {
-            "type": "BUFF",
-            "value": 5
-        },
-        "description": "Aumenta o ataque do portador em +5."
+        "range": 0,
+        "effect": {},
+        "description": "Aumenta o ataque do portador em +2."
+
+        criado
     },
     {
         "name": "Menino gentil",
@@ -45,7 +45,10 @@
             "type": "DRAW",
             "value": 1
         },
-        "description": "Ao ser invocado, puxe 1 carta."
+        "description": "Se ele quando ele entrar em campo estiver vazio, conceda +2 de ataque e +4 de vida",
+        "ability": "espiritoDeHeroi"
+
+        criado
     },
     {
         "name": "Oração",
@@ -177,6 +180,7 @@
     },
     {
         "name": "Soldado iniciado",
+        "type": "UNIT",
         "mana": 3,
         "energy": 3,
         "class": "army",
@@ -185,11 +189,11 @@
         "rarity": "comum",
         "artUrl": "https://drive.google.com/file/d/1nbHHcxYYb1pRcMsr3goR7NuLFrKnTWBN/view?usp=sharing",
         "range": 1,
-        "effect": {
-            "type": "BUFF",
-            "value": 5
-        },
-        "description": "Recebe +5 de ataque se houver outro soldado em campo."
+        "effect": {},
+        "description": "Ao receber proteção receba 10 de ataque.",
+        "ability": "soldadoIniciado"
+
+        criado
     },
     {
         "name": "Mulher arrependida",

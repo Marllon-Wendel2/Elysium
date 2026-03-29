@@ -7,7 +7,7 @@ import {
 
 import { Card } from '@prisma/client';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
-import { CreateCardDto, UpdateCardDto } from './cards.dto';
+import { CreateCardDto, UpdateCardDto } from './dtos/cards.dto';
 
 @Injectable()
 export class CardsService {
