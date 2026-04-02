@@ -11,6 +11,10 @@ import { Room } from 'src/rooms/room.entity';
 import { DeckService } from 'src/deck/deck.service';
 import { PlayersService } from 'src/players/players.service';
 import { shuffle } from 'src/helper/shuffle';
+import {
+  createFirstHand,
+  createInstanceOfDeck,
+} from 'src/helper/createInstance';
 
 @Injectable()
 export class GameService {
@@ -44,6 +48,7 @@ export class GameService {
 
     return {
       phase: state.phase,
+
       board: state.board,
 
       you: {
@@ -58,7 +63,6 @@ export class GameService {
         handCount: enemy.hand.length,
         deckCount: enemy.deck.length,
         victoryPoints: enemy.victoryPoints,
-        board: state.board,
       },
 
       turn: state.turn,
@@ -146,6 +150,7 @@ export class GameService {
 
   async startGame(roomId: string) {
     try {
+      //buscando room
       const room = await this.roomsService.get(roomId);
       if (!room) {
         console.log('room not found');
@@ -155,6 +160,7 @@ export class GameService {
       room.state.turn = 1;
       room.state.phase = 'STANDBY';
 
+      //montando os decks
       const playerOneDeckId = await this.playersService.findDeckById(
         room.players[0].id,
       );
@@ -169,28 +175,24 @@ export class GameService {
       const deckOne = await this.deckService.findDeckById(playerOneDeckId);
       const deckTwo = await this.deckService.findDeckById(playerTwoDeckId);
 
-      const deckOneInstance = deckOne.cards.flatMap((c) =>
-        Array.from({ length: c.quantity }, () => ({
-          instanceId: crypto.randomUUID(),
-          cardId: c.cardId,
-        })),
-      );
-
-      const deckTwoInstance = deckTwo.cards.flatMap((c) =>
-        Array.from({ length: c.quantity }, () => ({
-          instanceId: crypto.randomUUID(),
-          cardId: c.cardId,
-        })),
-      );
+      const deckOneInstance = createInstanceOfDeck(deckOne);
+      const deckTwoInstance = createInstanceOfDeck(deckTwo);
 
       if (!deckOneInstance.length || !deckTwoInstance.length) {
         throw new Error('Deck vazio');
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      room.state.playerOne.deck = shuffle(deckOneInstance as any);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      room.state.playerTwo.deck = shuffle(deckTwoInstance as any);
+      const deckOneShuffle = shuffle(deckOneInstance);
+      const deckTwoShuffle = shuffle(deckTwoInstance);
+
+      const firstHand = createFirstHand(deckOneShuffle);
+      const secondHand = createFirstHand(deckTwoShuffle);
+
+      room.state.playerOne.deck = deckOneShuffle;
+      room.state.playerTwo.deck = deckTwoShuffle;
+
+      room.state.playerOne.hand = firstHand;
+      room.state.playerTwo.hand = secondHand;
 
       await this.roomsService.updateRoom(room);
     } catch (error) {

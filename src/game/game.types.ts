@@ -56,8 +56,8 @@ export interface BoardSlot {
 type Position = 'FRONT' | 'BACK';
 
 interface PlayerState {
-  hand: string[];
-  deck: string[];
+  hand: CardInstance[];
+  deck: CardInstance[];
   graveyard: string[];
   victoryPoints: number;
   totalMana: number;
@@ -71,7 +71,7 @@ export interface PlayerGameView {
   board: BoardState;
 
   you: {
-    hand: string[];
+    hand: CardInstance[];
     deckCount: number;
     victoryPoints: number;
     totalMana: number;
@@ -82,7 +82,6 @@ export interface PlayerGameView {
     handCount: number;
     deckCount: number;
     victoryPoints: number;
-    board: BoardState;
   };
   winner: 'PLAYERONE' | 'PLAYERTWO' | 'NONE' | 'DRAW';
 }
