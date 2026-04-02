@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GameRules } from './game.rules';
 import { RoomsService } from '../rooms/rooms.service';
 import {
@@ -8,10 +8,17 @@ import {
   SlotChoice,
 } from './game.types';
 import { Room } from 'src/rooms/room.entity';
+import { DeckService } from 'src/deck/deck.service';
+import { PlayersService } from 'src/players/players.service';
+import { shuffle } from 'src/helper/shuffle';
 
 @Injectable()
 export class GameService {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly deckService: DeckService,
+    private readonly playersService: PlayersService,
+  ) {}
 
   // processAction(player: Player, action: any) {
   //   const room = this.roomsService.get(player.roomId!);
@@ -135,5 +142,60 @@ export class GameService {
     }
 
     return slots;
+  }
+
+  async startGame(roomId: string) {
+    try {
+      const room = await this.roomsService.get(roomId);
+      if (!room) {
+        console.log('room not found');
+        return;
+      }
+
+      room.state.turn = 1;
+      room.state.phase = 'STANDBY';
+
+      const playerOneDeckId = await this.playersService.findDeckById(
+        room.players[0].id,
+      );
+      const playerTwoDeckId = await this.playersService.findDeckById(
+        room.players[1].id,
+      );
+
+      if (!playerOneDeckId || !playerTwoDeckId) {
+        throw new Error('Deck not found');
+      }
+
+      const deckOne = await this.deckService.findDeckById(playerOneDeckId);
+      const deckTwo = await this.deckService.findDeckById(playerTwoDeckId);
+
+      const deckOneInstance = deckOne.cards.flatMap((c) =>
+        Array.from({ length: c.quantity }, () => ({
+          instanceId: crypto.randomUUID(),
+          cardId: c.cardId,
+        })),
+      );
+
+      const deckTwoInstance = deckTwo.cards.flatMap((c) =>
+        Array.from({ length: c.quantity }, () => ({
+          instanceId: crypto.randomUUID(),
+          cardId: c.cardId,
+        })),
+      );
+
+      if (!deckOneInstance.length || !deckTwoInstance.length) {
+        throw new Error('Deck vazio');
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      room.state.playerOne.deck = shuffle(deckOneInstance as any);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      room.state.playerTwo.deck = shuffle(deckTwoInstance as any);
+
+      await this.roomsService.updateRoom(room);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Erro ao iniciar o jogo');
+    }
   }
 }

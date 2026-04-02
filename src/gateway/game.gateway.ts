@@ -14,6 +14,7 @@ import { GameService } from '../game/game.service';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/infra/types';
+import { Player } from 'src/players/player.entity';
 
 type AuthenticatedSocket = Socket & {
   user?: { sub: string; email: string; roles: string; firstName: string };
@@ -50,7 +51,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(payload);
 
       socket.user = payload;
-      this.playersService.register(socket.id, payload.sub, payload.firstName);
+
+      const player: Player = {
+        id: payload.sub,
+        socketId: socket.id,
+        name: payload.firstName,
+      };
+      await this.playersService.register(player);
 
       console.log(
         `[CONEXÃO] Usuário ${payload.email} entrou com Socket ID: ${socket.id}`,
@@ -62,8 +69,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(socket: Socket) {
-    this.playersService.unregister(socket.id);
+  async handleDisconnect(socket: Socket) {
+    await this.playersService.unregister(socket.id);
     console.log(`Player ${socket.id} disconnected`);
   }
 
@@ -87,13 +94,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleCreateRoom(@ConnectedSocket() socket: AuthenticatedSocket) {
     console.log('chegou aqui');
 
-    const player = this.playersService.getBySocket(socket.id);
+    const player = await this.playersService.getBySocket(socket.id);
     if (!player) return;
 
     const roomString = await this.roomsService.createRoom(player.id);
 
     void socket.join(roomString);
-    player.roomId = roomString;
+
+    await this.playersService.setRoom(player.id, roomString);
+
     console.log(player);
 
     socket.emit('ROOM_CREATED', roomString);
@@ -104,11 +113,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() socket: AuthenticatedSocket,
     @MessageBody() roomId: string,
   ) {
-    const player = this.playersService.getBySocket(socket.id);
+    const player = await this.playersService.getBySocket(socket.id);
     if (!player) throw new NotFoundException('Player not found');
 
     const result = await this.roomsService.joinRoom(roomId, player.id);
-    if (!result) throw new NotFoundException('Room not found');
+    if (!result) {
+      socket.emit('ERROR', 'Room not found');
+      return;
+    }
 
     console.log(result);
 
@@ -118,6 +130,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     await socket.join(roomId);
+
+    await this.playersService.setRoom(player.id, roomId);
 
     socket.emit('ROOM_JOINED');
 
@@ -130,10 +144,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (!p1Id || !p2Id) return;
 
-      const playerOne = this.playersService.getById(p1Id);
-      const playerTwo = this.playersService.getById(p2Id);
+      const playerOne = await this.playersService.getById(p1Id);
+      const playerTwo = await this.playersService.getById(p2Id);
 
       if (!playerOne || !playerTwo) return;
+
       console.log('playerOne', playerOne);
       console.log('playerTwo', playerTwo);
 
@@ -147,7 +162,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() socket: Socket,
     @MessageBody() slots: { front: number; back: number },
   ) {
-    const player = this.playersService.getBySocket(socket.id);
+    const player = await this.playersService.getBySocket(socket.id);
     if (!player) return;
 
     const room = await this.roomsService.get(player.roomId!);
@@ -168,6 +183,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (result.ready) {
       this.server.to(room.id).emit('SETUP_FINISHED');
+      //inicia a partida
+      await this.gameService.startGame(room.id);
     }
   }
 }

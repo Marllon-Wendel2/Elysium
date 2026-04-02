@@ -67,7 +67,7 @@ export class RoomsService {
 
     room.players.push({ player: 'PLAYER TWO', id: playerId });
 
-    const player = this.playersService.getById(playerId);
+    const player = await this.playersService.getById(playerId);
     if (player) {
       player.roomId = roomId;
     }
