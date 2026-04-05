@@ -185,6 +185,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(room.id).emit('SETUP_FINISHED');
       //inicia a partida
       await this.gameService.startGame(room.id);
+
+      //retorna viewPlayer atualizada
+      const updatedRoom = await this.gameService.startGame(room.id);
+
+      await this.gameService.emitGameState(this.server, updatedRoom);
     }
   }
 }

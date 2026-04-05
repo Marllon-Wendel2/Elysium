@@ -45,13 +45,15 @@ export class RoomsService {
     return JSON.parse(data) as Room;
   }
 
-  async updateRoom(room: Room): Promise<void> {
+  async updateRoom(room: Room): Promise<Room> {
     await this.redis.set(
       `room:${room.id}`,
       JSON.stringify(room),
       'EX',
       60 * 60,
     );
+
+    return room;
   }
 
   async joinRoom(

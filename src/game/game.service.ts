@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { GameRules } from './game.rules';
 import { RoomsService } from '../rooms/rooms.service';
 import {
@@ -7,6 +11,7 @@ import {
   ServerGameState,
   SlotChoice,
 } from './game.types';
+import { Server } from 'socket.io';
 import { Room } from 'src/rooms/room.entity';
 import { DeckService } from 'src/deck/deck.service';
 import { PlayersService } from 'src/players/players.service';
@@ -148,19 +153,17 @@ export class GameService {
     return slots;
   }
 
-  async startGame(roomId: string) {
+  async startGame(roomId: string): Promise<Room> {
     try {
-      //buscando room
       const room = await this.roomsService.get(roomId);
+
       if (!room) {
-        console.log('room not found');
-        return;
+        throw new NotFoundException('Room not found');
       }
 
       room.state.turn = 1;
       room.state.phase = 'STANDBY';
 
-      //montando os decks
       const playerOneDeckId = await this.playersService.findDeckById(
         room.players[0].id,
       );
@@ -194,10 +197,29 @@ export class GameService {
       room.state.playerOne.hand = firstHand;
       room.state.playerTwo.hand = secondHand;
 
-      await this.roomsService.updateRoom(room);
+      return await this.roomsService.updateRoom(room);
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Erro ao iniciar o jogo');
+    }
+  }
+
+  async emitGameState(server: Server, room: Room) {
+    const p1Data = room.players.find((p) => p.player === 'PLAYER ONE');
+    const p2Data = room.players.find((p) => p.player === 'PLAYER TWO');
+
+    if (p1Data) {
+      const player = await this.playersService.getById(p1Data.id);
+      const view = this.createPlayerView(room.state, 'PLAYERONE');
+      if (player?.socketId)
+        server.to(player.socketId).emit('GAME_SYNC', { state: view });
+    }
+
+    if (p2Data) {
+      const player = await this.playersService.getById(p2Data.id);
+      const view = this.createPlayerView(room.state, 'PLAYERTWO');
+      if (player?.socketId)
+        server.to(player.socketId).emit('GAME_SYNC', { state: view });
     }
   }
 }
