@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Player } from './player.entity';
 import Redis from 'ioredis';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
+import { PlayerState } from 'src/game/game.types';
 
 @Injectable()
 export class PlayersService {
@@ -103,5 +104,17 @@ export class PlayersService {
     if (!deckSelect) throw new NotFoundException('Deck não encontrado');
 
     return deckSelect.playerProfile?.selectedDeckId;
+  }
+
+  drawFirstOfType(player: PlayerState, type: string) {
+    const index = player.deck.findIndex((card) => card.base.type === type);
+
+    if (index === -1) return null;
+
+    const [card] = player.deck.splice(index, 1);
+
+    player.hand.push(card);
+
+    return card;
   }
 }

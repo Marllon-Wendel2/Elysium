@@ -7,7 +7,9 @@ import { GameRules } from './game.rules';
 import { RoomsService } from '../rooms/rooms.service';
 import {
   BoardSlot,
+  BoardState,
   PlayerGameView,
+  PlayerState,
   ServerGameState,
   SlotChoice,
 } from './game.types';
@@ -20,6 +22,7 @@ import {
   createFirstHand,
   createInstanceOfDeck,
 } from 'src/helper/createInstance';
+import { effectHandlers } from 'src/effects';
 
 @Injectable()
 export class GameService {
@@ -28,20 +31,6 @@ export class GameService {
     private readonly deckService: DeckService,
     private readonly playersService: PlayersService,
   ) {}
-
-  // processAction(player: Player, action: any) {
-  //   const room = this.roomsService.get(player.roomId!);
-  //   // if (!room) return;
-
-  //   // if (!GameRules.canExecute(room.state, action)) return;
-
-  //   // room.state = GameReducer.apply(room.state, action);
-
-  //   // for (const p of room.players) {
-  //   //   const clientState = GamePresenter.toClientState(room.state, p);
-  //   //   // socket emit (iremos ligar depois)
-  //   // }
-  // }
 
   createPlayerView(
     state: ServerGameState,
@@ -221,5 +210,98 @@ export class GameService {
       if (player?.socketId)
         server.to(player.socketId).emit('GAME_SYNC', { state: view });
     }
+  }
+
+  drawTurn(player: PlayerState) {
+    const unit = this.playersService.drawFirstOfType(player, 'UNIT');
+    const equip = this.playersService.drawFirstOfType(player, 'EQUIP');
+
+    return {
+      unit,
+      equip,
+    };
+  }
+
+  getOrderedSlots(board: BoardState): BoardSlot[] {
+    const front = board.slots
+      .filter((s) => s.position === 'FRONT')
+      .sort((a, b) => b.lane - a.lane);
+
+    const back = board.slots
+      .filter((s) => s.position === 'BACK')
+      .sort((a, b) => b.lane - a.lane);
+
+    return [...front, ...back];
+  }
+
+  resolveStartEffects(state: ServerGameState) {
+    const orderedSlots = this.getOrderedSlots(state.board);
+
+    for (const slot of orderedSlots) {
+      const card = slot.cardInstance;
+      if (!card) continue;
+
+      const abilities = Array.isArray(card.base.ability)
+        ? (card.base.ability as Ability[])
+        : [];
+
+      for (const ability of abilities) {
+        if (ability.trigger === 'START_TURN') {
+          this.executeAbility(ability, state, {
+            sourceCard: card,
+            sourceSlot: slot,
+            owner: slot.owner,
+          });
+        }
+      }
+    }
+
+    return state;
+  }
+
+  executeAbility(
+    ability: Ability,
+    state: ServerGameState,
+    context: EffectContext,
+  ) {
+    const handler = effectHandlers[ability.effect as EffectKey];
+
+    if (!handler) {
+      console.warn('Effect not found:', ability.effect);
+      return state;
+    }
+
+    return handler(state, context);
+  }
+
+  async startRound(server: Server, room: Room) {
+    room.state.turn++;
+
+    if (room.state.turn > 1) {
+      for (const player of room.players) {
+        const { unit, equip } = this.drawTurn(
+          player.player === 'PLAYER ONE'
+            ? room.state.playerOne
+            : room.state.playerTwo,
+        );
+
+        server.to(player.id).emit('DRAW_CARDS', {
+          unit,
+          equip,
+        });
+      }
+    }
+
+    const newGameState = this.resolveStartEffects(room.state);
+
+    room.state = newGameState;
+
+    room.state.phase = 'DECLARATION';
+    room.state.pendingActions.PLAYERONE = [];
+    room.state.pendingActions.PLAYERTWO = [];
+
+    await this.roomsService.updateRoom(room);
+
+    await this.emitGameState(server, room);
   }
 }

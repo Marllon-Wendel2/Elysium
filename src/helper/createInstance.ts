@@ -19,6 +19,7 @@ export function createInstanceOfDeck(deck: {
         isOnBoard: false,
         hasAttacked: false,
       },
+      status: [],
     })),
   );
 }

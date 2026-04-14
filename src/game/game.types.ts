@@ -37,7 +37,7 @@ export interface PlayerAction {
   slotIndex?: number;
 }
 
-interface BoardState {
+export interface BoardState {
   slots: BoardSlot[];
 }
 
@@ -50,12 +50,12 @@ export interface BoardSlot {
   lane: number;
   position: Position;
   owner: 'PLAYERONE' | 'PLAYERTWO';
-  cardInstanceId?: string;
+  cardInstance?: CardInstance;
 }
 
 type Position = 'FRONT' | 'BACK';
 
-interface PlayerState {
+export interface PlayerState {
   hand: CardInstance[];
   deck: CardInstance[];
   graveyard: string[];
