@@ -8,6 +8,7 @@ import { RoomsService } from '../rooms/rooms.service';
 import {
   BoardSlot,
   BoardState,
+  PlayerAction,
   PlayerGameView,
   PlayerState,
   ServerGameState,
@@ -303,5 +304,48 @@ export class GameService {
     await this.roomsService.updateRoom(room);
 
     await this.emitGameState(server, room);
+  }
+
+  setActionsByPlayer(room: Room, playerId: string, actions: PlayerAction[]) {
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player) return;
+
+    const isPlayerOne = player.player === 'PLAYER ONE';
+
+    if (isPlayerOne) {
+      room.state.pendingActions.PLAYERONE = actions;
+    } else {
+      room.state.pendingActions.PLAYERTWO = actions;
+    }
+
+    if (
+      room.state.pendingActions.PLAYERONE.length > 0 &&
+      room.state.pendingActions.PLAYERTWO.length > 0
+    ) {
+      return { continue: true };
+    } else {
+      return { continue: false };
+    }
+  }
+
+  resolveActions(room: Room) {
+    console.log('Resolvendo ações');
+
+    return 'continue';
+  }
+
+  finishGame(room: Room, mimPointToWin) {
+    const playerOnePoint = room.state.playerOne.victoryPoints;
+    const playerTwoPoint = room.state.playerTwo.victoryPoints;
+
+    if (playerOnePoint >= mimPointToWin || playerTwoPoint >= mimPointToWin) {
+      room.state.winner =
+        playerOnePoint > playerTwoPoint ? 'PLAYERONE' : 'PLAYERTWO';
+      room.state.phase = 'FINISHED';
+      return this.roomsService.updateRoom(room);
+    } else {
+      room.state.phase = 'DECLARATION';
+    }
+    return this.roomsService.updateRoom(room);
   }
 }

@@ -15,6 +15,8 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/infra/types';
 import { Player } from 'src/players/player.entity';
+import { PlayerAction } from 'src/game/game.types';
+import { emit } from 'process';
 
 type AuthenticatedSocket = Socket & {
   user?: { sub: string; email: string; roles: string; firstName: string };
@@ -197,11 +199,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('SEND_ACTIONS')
   async handleSendActions(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() actions: ActionsType[],
+    @MessageBody() actions: PlayerAction[],
   ) {
     //verificar quem está enviando
+    const player = await this.playersService.getBySocket(socket.id);
+    if (!player) throw new NotFoundException('Player not found');
+
+    const room = await this.roomsService.get(player.roomId!);
+    if (!room) throw new NotFoundException('Room not found');
+
     //listar setar acões no State do game
-    //chamar o resolver
-    //finaliza game ou iniciar outro round
+    const continueGame = this.gameService.setActionsByPlayer(
+      room,
+      player.id,
+      actions,
+    );
+
+    if (continueGame?.continue) {
+      //chamar o resolver
+      const result = this.gameService.resolveActions(room);
+
+      //finaliza game ou iniciar outro round
+      if (result === 'continue') {
+        await this.gameService.startRound(this.server, room);
+      } else {
+        await this.gameService.finishGame(room);
+      }
+    } else {
+      socket.emit('ACTIONS_SENT_WAINTING_OPPONENT');
+    }
   }
 }
