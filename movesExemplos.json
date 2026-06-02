@@ -1,0 +1,17 @@
+[
+    {
+        "typeMove": "moveCard",
+        "targget": "front-2",
+        "whoDoes": "cardID"
+    },
+    {
+        "typeMove": "downCard",
+        "targget": "back-4",
+        "whoDoes": "cardID"
+    },
+    {
+        "typeMove": "atackSlot",
+        "targget": "front-2",
+        "whoDoes": "cardID"
+    }
+]

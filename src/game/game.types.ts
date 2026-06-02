@@ -30,11 +30,11 @@ export interface ServerGameState {
 }
 
 export interface PlayerAction {
-  type: 'CAST_SPELL' | 'ACTIVATE_ABILITY' | 'MOVE' | 'ATTACK';
-  sourceCardId: string;
-  targetId?: string;
+  type: ActionsType;
+  cardInstance: CardInstance;
+  targetSlot?: BoardSlot;
+  targetCard?: CardInstance;
   abilityKey?: string;
-  slotIndex?: number;
 }
 
 export interface BoardState {

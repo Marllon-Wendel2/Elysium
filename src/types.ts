@@ -25,5 +25,13 @@ declare global {
     owner: 'PLAYERONE' | 'PLAYERTWO';
   };
 
+  type ActionsType =
+    | 'CAST_SPELL'
+    | 'ACTIVATE_ABILITY'
+    | 'DOWN_CARD'
+    | 'MOVE'
+    | 'ATTACK'
+    | 'EVOLUTION';
+
   type EffectKey = 'arthurEscolhido' | 'DAMAGE' | 'HEAL';
 }

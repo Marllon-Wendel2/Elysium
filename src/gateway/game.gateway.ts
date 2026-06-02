@@ -193,4 +193,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.gameService.startRound(this.server, updatedRoom);
     }
   }
+
+  @SubscribeMessage('SEND_ACTIONS')
+  async handleSendActions(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() actions: ActionsType[],
+  ) {
+    //verificar quem está enviando
+    //listar setar acões no State do game
+    //chamar o resolver
+    //finaliza game ou iniciar outro round
+  }
 }

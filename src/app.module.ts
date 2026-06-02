@@ -16,9 +16,6 @@ import { DeckModule } from './deck/deck.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     RedisModule,
-    MongooseModule.forRoot(process.env.MONGO_STRING as string, {
-      dbName: 'card-game',
-    }),
     CardsModule,
     PrismaModule,
     UsersModule,
