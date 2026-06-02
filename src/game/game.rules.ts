@@ -13,54 +13,6 @@ export class GameRules {
     return front + back === max;
   }
 
-  static resolveAction(
-    room: Room,
-    actionsPlayerOne: PlayerAction[],
-    actionsPlayerTwo: PlayerAction[],
-  ) {
-    const allSpellUsed = GameRules.buildAction(
-      'CAST_SPELL',
-      actionsPlayerOne,
-      actionsPlayerTwo,
-    );
-
-    const evolutonsCard = GameRules.buildAction(
-      'EVOLUTION',
-      actionsPlayerOne,
-      actionsPlayerTwo,
-    );
-
-    const allMoveUsed = GameRules.buildAction(
-      'MOVE',
-      actionsPlayerOne,
-      actionsPlayerTwo,
-    );
-
-    const allCardDown = GameRules.buildAction(
-      'DOWN_CARD',
-      actionsPlayerOne,
-      actionsPlayerTwo,
-    );
-
-    const allAttacksUsed = GameRules.buildAction(
-      'ATTACK',
-      actionsPlayerOne,
-      actionsPlayerTwo,
-    );
-
-    GameRules.resolveSpell(room, allSpellUsed);
-
-    GameRules.resolveEvolution(room, evolutonsCard);
-
-    GameRules.resolveMove(room, allMoveUsed);
-
-    GameRules.resolveDownCard(room, allCardDown);
-
-    GameRules.resolveAttack(room, allAttacksUsed);
-
-    GameRules.resolveDead(room);
-  }
-
   static buildAction(
     type: ActionsType,
     actionsPlayerOne: PlayerAction[],

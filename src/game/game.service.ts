@@ -3,7 +3,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { GameRules } from './game.rules';
 import { RoomsService } from '../rooms/rooms.service';
 import {
   BoardSlot,
@@ -25,6 +24,8 @@ import {
 } from 'src/helper/createInstance';
 import { effectHandlers } from 'src/effects';
 import { groupActions } from 'src/helper/groupActions';
+import { alternatingArrays } from 'src/helper/alternatingArray';
+import { GameRules } from './game.rules';
 
 @Injectable()
 export class GameService {
@@ -32,6 +33,7 @@ export class GameService {
     private readonly roomsService: RoomsService,
     private readonly deckService: DeckService,
     private readonly playersService: PlayersService,
+    private readonly gameRules: GameRules,
   ) {}
 
   createPlayerView(
@@ -335,14 +337,23 @@ export class GameService {
     const actionsPlayerOne = room.state.pendingActions.PLAYERONE;
     const actionsPlayerTwo = room.state.pendingActions.PLAYERTWO;
 
+    //separando acoes
     const groupedActions = {
       PLAYERONE: groupActions(actionsPlayerOne),
       PLAYERTWO: groupActions(actionsPlayerTwo),
     };
 
     const whoFirst = room.state.turn % 2 === 0 ? 'PLAYERTWO' : 'PLAYERONE';
+    const whoSecond = whoFirst === 'PLAYERONE' ? 'PLAYERTWO' : 'PLAYERONE';
 
-    //separando acoes
+    GameRules.resolveSpell(
+      room,
+      alternatingArrays(
+        groupedActions[whoFirst].spells,
+        groupedActions[whoSecond].spells,
+      ),
+    );
+
     //resolvendo individualmente
 
     return 'continue';
