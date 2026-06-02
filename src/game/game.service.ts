@@ -334,7 +334,7 @@ export class GameService {
     return 'continue';
   }
 
-  finishGame(room: Room, mimPointToWin) {
+  finishGame(room: Room, mimPointToWin: number) {
     const playerOnePoint = room.state.playerOne.victoryPoints;
     const playerTwoPoint = room.state.playerTwo.victoryPoints;
 
