@@ -24,6 +24,7 @@ import {
   createInstanceOfDeck,
 } from 'src/helper/createInstance';
 import { effectHandlers } from 'src/effects';
+import { groupActions } from 'src/helper/groupActions';
 
 @Injectable()
 export class GameService {
@@ -330,6 +331,19 @@ export class GameService {
 
   resolveActions(room: Room) {
     console.log('Resolvendo ações');
+    //buscando acoes
+    const actionsPlayerOne = room.state.pendingActions.PLAYERONE;
+    const actionsPlayerTwo = room.state.pendingActions.PLAYERTWO;
+
+    const groupedActions = {
+      PLAYERONE: groupActions(actionsPlayerOne),
+      PLAYERTWO: groupActions(actionsPlayerTwo),
+    };
+
+    const whoFirst = room.state.turn % 2 === 0 ? 'PLAYERTWO' : 'PLAYERONE';
+
+    //separando acoes
+    //resolvendo individualmente
 
     return 'continue';
   }
