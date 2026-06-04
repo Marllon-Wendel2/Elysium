@@ -33,5 +33,5 @@ declare global {
     | 'ATTACK'
     | 'EVOLUTION';
 
-  type EffectKey = 'arthurEscolhido' | 'DAMAGE' | 'HEAL';
+  type EffectKey = 'arthurEscolhido' | 'DAMAGE' | 'HEAL' | (string & {});
 }

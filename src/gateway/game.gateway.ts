@@ -16,7 +16,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/infra/types';
 import { Player } from 'src/players/player.entity';
 import { PlayerAction } from 'src/game/game.types';
-import { emit } from 'process';
 
 type AuthenticatedSocket = Socket & {
   user?: { sub: string; email: string; roles: string; firstName: string };
