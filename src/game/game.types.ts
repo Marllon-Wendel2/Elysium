@@ -36,6 +36,7 @@ export interface PlayerAction {
   targetCard?: CardInstance;
   abilityKey: string;
   owner: 'PLAYERONE' | 'PLAYERTWO';
+  invoqueWay: 'EVOLUTION' | 'NORMAL';
 }
 
 export interface BoardState {

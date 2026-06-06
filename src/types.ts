@@ -10,6 +10,7 @@ declare global {
       currentEnergy: number;
       isOnBoard: boolean;
       hasAttacked: boolean;
+      canEvolution: boolean;
     };
     status: string[];
   };

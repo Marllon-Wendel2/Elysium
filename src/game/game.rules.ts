@@ -1,5 +1,5 @@
 import { Room } from 'src/rooms/room.entity';
-import { PlayerAction } from './game.types';
+import { BoardState, PlayerAction } from './game.types';
 import { effectHandlers } from 'src/effects';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { Injectable } from '@nestjs/common';
@@ -43,12 +43,16 @@ export class GameRules {
     return allActionsByType;
   }
 
-  async resolveSpell(roomId: string, allSpellUsed: PlayerAction[]) {
+  async resolveSpell(
+    roomId: string,
+    allSpellUsed: PlayerAction[],
+  ): Promise<boolean> {
     for (const action of allSpellUsed) {
       const room = await this.roomService.get(roomId);
 
       if (!room) {
-        throw new Error('Room not found');
+        console.log('room não encontrado no resolveSpell');
+        return false;
       }
 
       const handler = effectHandlers[action.abilityKey];
@@ -64,16 +68,63 @@ export class GameRules {
         owner: action.owner,
       });
     }
-    return 'ok';
+    return true;
   }
 
-  static resolveMove(room: Room, allSpellUsed: PlayerAction[]) {
+  static resolveMove(room: Room, allSpellUsed: PlayerAction[]): boolean {
     console.log(allSpellUsed);
-    return 'ok';
+    return true;
   }
-  static resolveDownCard(room: Room, allSpellUsed: PlayerAction[]) {
-    console.log(allSpellUsed);
-    return 'ok';
+
+  async resolveDownCard(
+    roomId: string,
+    allCardDown: PlayerAction[],
+  ): Promise<boolean> {
+    for (const action of allCardDown) {
+      const room = await this.roomService.get(roomId);
+
+      if (!room) {
+        console.log('Room não encontrada no resolve DownCard');
+        return false;
+      }
+
+      const canDown = GameRules.canDown(action, room.state.board);
+
+      if (canDown) {
+        await this.invoceCard(room, action);
+      }
+    }
+
+    return true;
+  }
+
+  static canDown(action: PlayerAction, dashBoard: BoardState): boolean {
+    const cardInSlotSelect = dashBoard.slots.find(
+      (slot) =>
+        slot.lane === action.targetSlot?.lane &&
+        slot.owner === action.targetSlot.owner &&
+        slot.position === action.targetSlot.position,
+    )?.cardInstance;
+
+    if (action.invoqueWay === 'EVOLUTION') {
+      return (
+        !!cardInSlotSelect &&
+        action.cardInstance.base.evolvesFromId === cardInSlotSelect.base.id &&
+        action.cardInstance.state.canEvolution
+      );
+    }
+
+    if (action.invoqueWay === 'NORMAL') {
+      return (
+        !cardInSlotSelect && action.cardInstance.base.evolvesFromId === null
+      );
+    }
+
+    return false;
+  }
+
+  async invoceCard(room: Room, action: PlayerAction) {
+    room.state.board.slots[0].
   }
 
   static resolveAttack(room: Room, allSpellUsed: PlayerAction[]) {

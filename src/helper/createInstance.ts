@@ -23,6 +23,7 @@ export function createInstanceOfDeck(deck: {
         currentEnergy: c.card.energy ?? 0,
         isOnBoard: false,
         hasAttacked: false,
+        canEvolution: false,
       },
       status: [],
     })),

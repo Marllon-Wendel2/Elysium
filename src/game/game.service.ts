@@ -371,6 +371,14 @@ export class GameService {
       ),
     );
 
+    await this.gameRules.resolveDownCard(
+      room.id,
+      alternatingArrays(
+        groupedActions[whoFirst].downCards,
+        groupedActions[whoSecond].downCards,
+      ),
+    );
+
     //resolvendo individualmente
 
     return 'continue';
