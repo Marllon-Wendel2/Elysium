@@ -11,7 +11,12 @@ export function createInstanceOfDeck(deck: {
     Array.from({ length: c.quantity }, () => ({
       instanceId: crypto.randomUUID(),
 
-      base: c.card,
+      base: {
+        ...c.card,
+        ability: Array.isArray(c.card.ability)
+          ? (c.card.ability as Ability[])
+          : [],
+      },
 
       state: {
         currentLife: c.card.life ?? 0,

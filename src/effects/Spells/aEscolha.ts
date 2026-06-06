@@ -1,8 +1,9 @@
-import { ServerGameState } from 'src/game/game.types';
+import { Room } from 'src/rooms/room.entity';
 
-export function aEscolha(state: ServerGameState, context: EffectContext) {
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function aEscolha(room: Room, context: EffectContext) {
   console.log(
-    `A magia A escolha foi utilizada em: ${JSON.stringify(context.sourceSlot)}`,
+    `A magia A escolha foi utilizada em: ${JSON.stringify(context.sourceCard)}`,
   );
-  return state;
+  return true;
 }

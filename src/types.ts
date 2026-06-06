@@ -4,7 +4,7 @@ import { BoardSlot } from './game/game.types';
 declare global {
   type CardInstance = {
     instanceId: string;
-    base: Card;
+    base: GameCard;
     state: {
       currentLife: number;
       currentEnergy: number;
@@ -20,8 +20,8 @@ declare global {
   };
 
   type EffectContext = {
-    sourceCard: CardInstance;
-    sourceSlot: BoardSlot;
+    sourceCard: CardInstance | null;
+    sourceSlot: BoardSlot | null;
     owner: 'PLAYERONE' | 'PLAYERTWO';
   };
 
@@ -34,4 +34,8 @@ declare global {
     | 'EVOLUTION';
 
   type EffectKey = 'arthurEscolhido' | 'DAMAGE' | 'HEAL' | (string & {});
+
+  type GameCard = Omit<Card, 'ability'> & {
+    ability: Ability[];
+  };
 }

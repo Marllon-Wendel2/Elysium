@@ -1,13 +1,11 @@
-import { ServerGameState } from 'src/game/game.types';
 import { arthurEscolhido } from './arthurEscolhido';
 import { aEscolha } from './Spells/aEscolha';
+import { Room } from 'src/rooms/room.entity';
 
 export const effectHandlers: Record<
   string,
-  (state: ServerGameState, context: EffectContext) => ServerGameState
+  (room: Room, context: EffectContext) => Promise<boolean>
 > = {
   arthurEscolhido,
   aEscolha,
-  DAMAGE: (state) => state,
-  HEAL: (state) => state,
 };

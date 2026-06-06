@@ -34,7 +34,8 @@ export interface PlayerAction {
   cardInstance: CardInstance;
   targetSlot?: BoardSlot;
   targetCard?: CardInstance;
-  abilityKey?: string;
+  abilityKey: string;
+  owner: 'PLAYERONE' | 'PLAYERTWO';
 }
 
 export interface BoardState {

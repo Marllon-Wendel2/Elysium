@@ -238,44 +238,46 @@ export class GameService {
     return [...front, ...back];
   }
 
-  resolveStartEffects(state: ServerGameState) {
-    const orderedSlots = this.getOrderedSlots(state.board);
+  async resolveStartEffects(room: Room) {
+    const orderedSlots = this.getOrderedSlots(room.state.board);
 
     for (const slot of orderedSlots) {
       const card = slot.cardInstance;
       if (!card) continue;
 
       const abilities = Array.isArray(card.base.ability)
-        ? (card.base.ability as Ability[])
+        ? card.base.ability
         : [];
 
       for (const ability of abilities) {
-        if (ability.trigger === 'START_TURN') {
-          this.executeAbility(ability, state, {
-            sourceCard: card,
-            sourceSlot: slot,
-            owner: slot.owner,
-          });
+        if (ability.trigger !== 'START_TURN') {
+          continue;
         }
+
+        await this.executeAbility(ability, room, {
+          sourceCard: card,
+          sourceSlot: slot,
+          owner: slot.owner,
+        });
       }
     }
 
-    return state;
+    return room;
   }
 
-  executeAbility(
+  async executeAbility(
     ability: Ability,
-    state: ServerGameState,
+    room: Room,
     context: EffectContext,
-  ) {
-    const handler = effectHandlers[ability.effect as EffectKey];
+  ): Promise<boolean> {
+    const handler = effectHandlers[ability.effect];
 
     if (!handler) {
       console.warn('Effect not found:', ability.effect);
-      return state;
+      return false;
     }
 
-    return handler(state, context);
+    return await handler(room, context);
   }
 
   async startRound(server: Server, room: Room) {
@@ -296,9 +298,9 @@ export class GameService {
       }
     }
 
-    const newGameState = this.resolveStartEffects(room.state);
+    const newGameState = await this.resolveStartEffects(room);
 
-    room.state = newGameState;
+    room = newGameState;
 
     room.state.phase = 'DECLARATION';
     room.state.pendingActions.PLAYERONE = [];
@@ -309,7 +311,12 @@ export class GameService {
     await this.emitGameState(server, room);
   }
 
-  setActionsByPlayer(room: Room, playerId: string, actions: PlayerAction[]) {
+  async setActionsByPlayer(
+    room: Room,
+    playerId: string,
+    actions: PlayerAction[],
+  ) {
+    console.log('entrou no setActions');
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return;
 
@@ -321,21 +328,29 @@ export class GameService {
       room.state.pendingActions.PLAYERTWO = actions;
     }
 
+    await this.roomsService.updateRoom(room);
+
     if (
       room.state.pendingActions.PLAYERONE.length > 0 &&
       room.state.pendingActions.PLAYERTWO.length > 0
     ) {
-      return { continue: true };
+      return { continue: true, room };
     } else {
-      return { continue: false };
+      return { continue: false, room };
     }
   }
 
-  resolveActions(room: Room) {
+  async resolveActions(room: Room) {
     console.log('Resolvendo ações');
     //buscando acoes
     const actionsPlayerOne = room.state.pendingActions.PLAYERONE;
     const actionsPlayerTwo = room.state.pendingActions.PLAYERTWO;
+
+    if (actionsPlayerOne.length > 0)
+      console.log('ações do player one encontradas');
+
+    if (actionsPlayerTwo.length > 0)
+      console.log('ações do player two encontradas');
 
     //separando acoes
     const groupedActions = {
@@ -343,11 +358,13 @@ export class GameService {
       PLAYERTWO: groupActions(actionsPlayerTwo),
     };
 
+    console.log(`Acoes agrupadas: ${JSON.stringify(groupedActions)}`);
+
     const whoFirst = room.state.turn % 2 === 0 ? 'PLAYERTWO' : 'PLAYERONE';
     const whoSecond = whoFirst === 'PLAYERONE' ? 'PLAYERTWO' : 'PLAYERONE';
 
-    GameRules.resolveSpell(
-      room,
+    await this.gameRules.resolveSpell(
+      room.id,
       alternatingArrays(
         groupedActions[whoFirst].spells,
         groupedActions[whoSecond].spells,

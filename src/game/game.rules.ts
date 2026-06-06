@@ -1,10 +1,12 @@
 import { Room } from 'src/rooms/room.entity';
 import { PlayerAction } from './game.types';
+import { effectHandlers } from 'src/effects';
+import { RoomsService } from 'src/rooms/rooms.service';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class GameRules {
-  // static canExecute(state: any, action: any): boolean {
-  //   return true;
-  // }
+  constructor(private readonly roomService: RoomsService) {}
 
   static isValidSlotChoice(front: number, back: number, max: number): boolean {
     if (!Number.isInteger(front) || !Number.isInteger(back)) return false;
@@ -41,8 +43,27 @@ export class GameRules {
     return allActionsByType;
   }
 
-  static resolveSpell(room: Room, allSpellUsed: PlayerAction[]) {
-    console.log(allSpellUsed);
+  async resolveSpell(roomId: string, allSpellUsed: PlayerAction[]) {
+    for (const action of allSpellUsed) {
+      const room = await this.roomService.get(roomId);
+
+      if (!room) {
+        throw new Error('Room not found');
+      }
+
+      const handler = effectHandlers[action.abilityKey];
+
+      if (!handler) {
+        console.warn(`Effect not found: ${action.abilityKey}`);
+        continue;
+      }
+
+      await handler(room, {
+        sourceCard: action.targetCard || null,
+        sourceSlot: action.targetSlot || null,
+        owner: action.owner,
+      });
+    }
     return 'ok';
   }
 

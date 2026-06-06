@@ -201,14 +201,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() actions: PlayerAction[],
   ) {
     //verificar quem está enviando
+    console.log('Recebendo message');
     const player = await this.playersService.getBySocket(socket.id);
     if (!player) throw new NotFoundException('Player not found');
 
     const room = await this.roomsService.get(player.roomId!);
     if (!room) throw new NotFoundException('Room not found');
 
+    console.log(
+      `O player é: ${player.name} e tentou usar a mágia: ${actions[0].abilityKey}`,
+    );
+
     //listar setar acões no State do game
-    const continueGame = this.gameService.setActionsByPlayer(
+    const continueGame = await this.gameService.setActionsByPlayer(
       room,
       player.id,
       actions,
@@ -219,7 +224,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const result = this.gameService.resolveActions(room);
 
       //finaliza game ou iniciar outro round
-      if (result === 'continue') {
+      if ((await result) === 'continue') {
         await this.gameService.startRound(this.server, room);
       } else {
         await this.gameService.finishGame(room, 10);
