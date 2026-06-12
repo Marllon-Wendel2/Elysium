@@ -27,6 +27,8 @@
 
 ## Project setup
 
+docker start redis-game
+
 ```bash
 $ pnpm install
 ```

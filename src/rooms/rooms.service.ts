@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Room } from './room.entity';
+import { Room, PlayerSide } from './room.entity';
 import { randomUUID } from 'crypto';
 import { initialState } from 'src/game/game.state';
 import Redis from 'ioredis';
 import { PlayersService } from 'src/players/players.service';
+import { BoardSlot } from 'src/game/game.types';
 
 type JoinRoomResult =
   | { error: 'ROOM_FULL' }
@@ -54,6 +55,43 @@ export class RoomsService {
     );
 
     return room;
+  }
+
+  async updateHand(
+    roomId: string,
+    owner: PlayerSide | 'PLAYERONE' | 'PLAYERTWO',
+    newHand: CardInstance[],
+  ): Promise<Room | null> {
+    const room = await this.get(roomId);
+    if (!room) return null;
+
+    const key =
+      owner === 'PLAYER ONE' || owner === 'PLAYERONE'
+        ? 'playerOne'
+        : 'playerTwo';
+    room.state[key].hand = newHand;
+
+    return this.updateRoom(room);
+  }
+
+  async updateSlot(roomId: string, slot: BoardSlot): Promise<Room | null> {
+    const room = await this.get(roomId);
+    if (!room) return null;
+
+    const index = room.state.board.slots.findIndex(
+      (s) =>
+        s.lane === slot.lane &&
+        s.position === slot.position &&
+        s.owner === slot.owner,
+    );
+
+    if (index !== -1) {
+      room.state.board.slots[index] = slot;
+    } else {
+      room.state.board.slots.push(slot);
+    }
+
+    return this.updateRoom(room);
   }
 
   async joinRoom(
