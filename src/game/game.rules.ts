@@ -36,8 +36,10 @@ export class GameRules {
     );
 
     for (let i = 0; i < limit; i++) {
-      allActionsByType.push(allActionPlayerOneByType[i]);
-      allActionsByType.push(allActionPlayerTwoByType[i]);
+      if (allActionPlayerOneByType[i] !== undefined)
+        allActionsByType.push(allActionPlayerOneByType[i]);
+      if (allActionPlayerTwoByType[i] !== undefined)
+        allActionsByType.push(allActionPlayerTwoByType[i]);
     }
 
     return allActionsByType;
@@ -116,7 +118,7 @@ export class GameRules {
       return (
         !!cardInSlotSelect &&
         action.cardInstance.base.evolvesFromId === cardInSlotSelect.base.id &&
-        action.cardInstance.state.canEvolution
+        cardInSlotSelect.state.canEvolution
       );
     }
 
@@ -159,9 +161,16 @@ export class GameRules {
     const [cardRemoved] = playerHand.splice(indexOfInstanceCard, 1);
 
     /// Verificar se o slot pode receber essa carta
+    const realBoardSlot = room.state.board.slots.find(
+      (s) =>
+        s.lane === action.targetSlot!.lane &&
+        s.position === action.targetSlot!.position &&
+        s.owner === action.owner,
+    );
+
     const canInvoke: boolean = GameRules.validateSlotForCard(
       action,
-      action.targetSlot,
+      realBoardSlot || action.targetSlot,
       cardRemoved,
     );
 
@@ -201,7 +210,7 @@ export class GameRules {
 
     //se for baixar carta verificar se o slot está vazio
     if (action.invoqueWay === 'NORMAL') {
-      const canDown = slotTarget.cardInstance === null ? true : false;
+      const canDown = !slotTarget.cardInstance ? true : false;
       return canDown;
     }
 

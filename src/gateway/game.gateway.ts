@@ -225,9 +225,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       //finaliza game ou iniciar outro round
       if ((await result) === 'continue') {
-        await this.gameService.startRound(this.server, room);
+        const updatedRoom = await this.roomsService.get(room.id);
+        if (updatedRoom) {
+          await this.gameService.startRound(this.server, updatedRoom);
+        }
       } else {
-        await this.gameService.finishGame(room, 10);
+        const updatedRoom = await this.roomsService.get(room.id);
+        if (updatedRoom) {
+          await this.gameService.finishGame(updatedRoom, 10);
+        }
       }
     } else {
       socket.emit('ACTIONS_SENT_WAINTING_OPPONENT');
