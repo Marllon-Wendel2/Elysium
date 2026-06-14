@@ -154,7 +154,7 @@ export class GameService {
         throw new NotFoundException('Room not found');
       }
 
-      room.state.turn = 1;
+      room.state.turn = 0;
       room.state.phase = 'STANDBY';
 
       const playerOneDeckId = await this.playersService.findDeckById(
@@ -280,14 +280,47 @@ export class GameService {
     return await handler(room, context);
   }
 
+  calculateManaFromBoard(
+    room: Room,
+    playerSide: 'PLAYERONE' | 'PLAYERTWO',
+  ): number {
+    const slots = room.state.board.slots.filter(
+      (s) => s.owner === playerSide && s.cardInstance,
+    );
+
+    let totalMana = 0;
+    for (const slot of slots) {
+      const card = slot.cardInstance!;
+      if (card.base.type !== 'EQUIP' && card.base.type !== 'SPEEL') {
+        totalMana += card.base.mana;
+      }
+    }
+
+    return totalMana;
+  }
+
   async startRound(server: Server, room: Room) {
     room.state.turn++;
 
-    //incrementar mana dos jogadores
-    room.state.playerOne.totalMana = room.state.turn;
-    room.state.playerOne.availableMana = room.state.turn;
-    room.state.playerTwo.totalMana = room.state.turn;
-    room.state.playerTwo.availableMana = room.state.turn;
+    //resetar estado das cartas no board
+    for (const slot of room.state.board.slots) {
+      if (slot.cardInstance) {
+        slot.cardInstance.state.hasAttacked = false;
+        slot.cardInstance.state.canEvolution = true;
+      }
+    }
+
+    //calcular mana dos jogadores baseado no board
+    room.state.playerOne.totalMana = this.calculateManaFromBoard(
+      room,
+      'PLAYERONE',
+    );
+    room.state.playerOne.availableMana = room.state.playerOne.totalMana;
+    room.state.playerTwo.totalMana = this.calculateManaFromBoard(
+      room,
+      'PLAYERTWO',
+    );
+    room.state.playerTwo.availableMana = room.state.playerTwo.totalMana;
     console.log(
       `[startRound] Turn ${room.state.turn} — Mana P1=${room.state.playerOne.availableMana}, P2=${room.state.playerTwo.availableMana}`,
     );
@@ -326,6 +359,12 @@ export class GameService {
     actions: PlayerAction[],
   ) {
     console.log('entrou no setActions');
+
+    if (room.state.phase !== 'DECLARATION') {
+      console.log(`Fase inválida: ${room.state.phase}`);
+      return { continue: false, room, error: 'INVALID_PHASE' };
+    }
+
     const player = room.players.find((p) => p.id === playerId);
     if (!player) return;
 
@@ -402,6 +441,23 @@ export class GameService {
     if (roomAfterAttack) {
       await this.gameRules.resolveDead(roomAfterAttack);
       console.log('[resolveActions] resolveDead processado e salvo');
+    }
+
+    //verificar vencedor (20+ pontos)
+    const roomAfterDead = await this.roomsService.get(room.id);
+    if (roomAfterDead) {
+      const p1 = roomAfterDead.state.playerOne.victoryPoints;
+      const p2 = roomAfterDead.state.playerTwo.victoryPoints;
+
+      if (p1 >= 20 || p2 >= 20) {
+        roomAfterDead.state.winner = p1 > p2 ? 'PLAYERONE' : 'PLAYERTWO';
+        roomAfterDead.state.phase = 'FINISHED';
+        await this.roomsService.updateRoom(roomAfterDead);
+        console.log(
+          `[resolveActions] Fim de jogo — ${roomAfterDead.state.winner} venceu com P1=${p1}, P2=${p2}`,
+        );
+        return 'finished';
+      }
     }
 
     return 'continue';

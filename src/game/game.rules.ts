@@ -105,6 +105,30 @@ export class GameRules {
       }
       log(step, `Room "${roomId}" encontrada com sucesso`);
 
+      const playerState =
+        action.owner === 'PLAYERONE'
+          ? room.state.playerOne
+          : room.state.playerTwo;
+
+      //deduzir mana
+      const spellCost = action.cardInstance.base.mana;
+      playerState.availableMana -= spellCost;
+      log(
+        step,
+        `Mana deduzida: ${spellCost} → availableMana=${playerState.availableMana}`,
+      );
+
+      //remover spell da mão
+      const handIndex = playerState.hand.findIndex(
+        (c) => c.instanceId === action.cardInstance.instanceId,
+      );
+      if (handIndex !== -1) {
+        playerState.hand.splice(handIndex, 1);
+        log(step, `Spell removida da mão`);
+      }
+
+      await this.roomService.updateRoom(room);
+
       const handler = effectHandlers[action.abilityKey];
 
       if (!handler) {
@@ -502,8 +526,9 @@ export class GameRules {
 
     const attackerRange = attackerSlot.cardInstance.base?.range ?? 0;
 
-    if (attackerRange === 0 || null) {
+    if (attackerRange === 0 || attackerRange === null) {
       log(step, 'Card não possui range para atacar.');
+      return false;
     }
 
     let rangedNeed = 0;

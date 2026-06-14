@@ -208,8 +208,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const room = await this.roomsService.get(player.roomId!);
     if (!room) throw new NotFoundException('Room not found');
 
+    if (!actions || actions.length === 0) {
+      socket.emit('ERROR', 'Nenhuma ação enviada');
+      return;
+    }
+
     console.log(
-      `O player é: ${player.name} e tentou usar a mágia: ${actions[0].abilityKey}`,
+      `O player é: ${player.name} e enviou ${actions.length} ação(ões)`,
     );
 
     //listar setar acões no State do game
@@ -219,12 +224,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       actions,
     );
 
+    if (continueGame?.error) {
+      socket.emit('ERROR', continueGame.error);
+      return;
+    }
+
     if (continueGame?.continue) {
       //chamar o resolver
-      const result = this.gameService.resolveActions(room);
+      const result = await this.gameService.resolveActions(room);
 
       //finaliza game ou iniciar outro round
-      if ((await result) === 'continue') {
+      if (result === 'continue') {
         const updatedRoom = await this.roomsService.get(room.id);
         if (updatedRoom) {
           await this.gameService.startRound(this.server, updatedRoom);
@@ -232,11 +242,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else {
         const updatedRoom = await this.roomsService.get(room.id);
         if (updatedRoom) {
-          await this.gameService.finishGame(updatedRoom, 10);
+          await this.gameService.emitGameState(this.server, updatedRoom);
         }
       }
     } else {
-      socket.emit('ACTIONS_SENT_WAINTING_OPPONENT');
+      socket.emit('ACTIONS_SENT_WAITING_OPPONENT');
     }
   }
 }
