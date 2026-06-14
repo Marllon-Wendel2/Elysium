@@ -11,6 +11,8 @@ declare global {
       isOnBoard: boolean;
       hasAttacked: boolean;
       canEvolution: boolean;
+      currentAttack: number;
+      equipment?: CardInstance[];
     };
     status: string[];
   };

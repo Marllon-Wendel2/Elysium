@@ -283,6 +283,15 @@ export class GameService {
   async startRound(server: Server, room: Room) {
     room.state.turn++;
 
+    //incrementar mana dos jogadores
+    room.state.playerOne.totalMana = room.state.turn;
+    room.state.playerOne.availableMana = room.state.turn;
+    room.state.playerTwo.totalMana = room.state.turn;
+    room.state.playerTwo.availableMana = room.state.turn;
+    console.log(
+      `[startRound] Turn ${room.state.turn} — Mana P1=${room.state.playerOne.availableMana}, P2=${room.state.playerTwo.availableMana}`,
+    );
+
     if (room.state.turn > 1) {
       for (const player of room.players) {
         const { unit, equip } = this.drawTurn(
@@ -379,7 +388,21 @@ export class GameService {
       ),
     );
 
-    //resolvendo individualmente
+    //resolvendo attack
+    await this.gameRules.resolveAttack(
+      room.id,
+      alternatingArrays(
+        groupedActions[whoFirst].attacks,
+        groupedActions[whoSecond].attacks,
+      ),
+    );
+
+    //processar mortes
+    const roomAfterAttack = await this.roomsService.get(room.id);
+    if (roomAfterAttack) {
+      await this.gameRules.resolveDead(roomAfterAttack);
+      console.log('[resolveActions] resolveDead processado e salvo');
+    }
 
     return 'continue';
   }

@@ -1,7 +1,6 @@
 import { GameRules } from '../game.rules';
 import { BoardSlot, BoardState, PlayerAction } from '../game.types';
 import { Room } from '../../rooms/room.entity';
-import { RoomsService } from '../../rooms/rooms.service';
 import { initialState } from '../game.state';
 
 function makeCard(
@@ -20,6 +19,7 @@ function makeCard(
       hasAttacked: false,
       isOnBoard: false,
       currentLife: 2,
+      currentAttack: 2,
     },
     status: [],
     ...overrides,
@@ -74,6 +74,7 @@ function makeRoom(hand: CardInstance[]): Room {
       ...initialState,
       board: makeBoard(),
       playerOne: { ...initialState.playerOne, hand },
+      playerTwo: { ...initialState.playerTwo },
     },
     'PLAYING',
   );
@@ -104,6 +105,7 @@ describe('GameRules.canDown', () => {
         hasAttacked: false,
         isOnBoard: false,
         currentLife: 4,
+        currentAttack: 2,
       },
     });
     const evoCard = makeCard({
@@ -139,6 +141,7 @@ describe('GameRules.canDown', () => {
         hasAttacked: false,
         isOnBoard: false,
         currentLife: 4,
+        currentAttack: 2,
       },
     });
     const evoCard = makeCard({
@@ -243,5 +246,201 @@ describe('GameRules.invoceCard', () => {
         cardInstance: expect.objectContaining({ instanceId: 'card-1' }),
       }),
     );
+  });
+});
+
+describe('GameRules.findAttackerSlot', () => {
+  it('deve encontrar slot do atacante', () => {
+    const attacker = makeCard({ instanceId: 'att-1', base: { id: 'b1', evolvesFromId: null, range: 1 } as GameCard });
+    const board = makeBoard([
+      { lane: 1, position: 'FRONT', owner: 'PLAYERONE', cardInstance: attacker },
+    ]);
+    const action = makeAction({ cardInstance: attacker, owner: 'PLAYERONE' });
+
+    const result = GameRules.findAttackerSlot(action, board);
+
+    expect(result).toBeDefined();
+    expect(result?.lane).toBe(1);
+    expect(result?.position).toBe('FRONT');
+  });
+
+  it('deve retornar undefined se atacante não estiver no board', () => {
+    const attacker = makeCard({ instanceId: 'att-1' });
+    const board = makeBoard([]);
+    const action = makeAction({ cardInstance: attacker, owner: 'PLAYERONE' });
+
+    const result = GameRules.findAttackerSlot(action, board);
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('GameRules.findAttackTarget', () => {
+  it('deve encontrar slot do alvo', () => {
+    const target = makeCard({ instanceId: 'tgt-1' });
+    const board = makeBoard([
+      { lane: 2, position: 'FRONT', owner: 'PLAYERTWO', cardInstance: target },
+    ]);
+    const action = makeAction({
+      targetSlot: { lane: 2, position: 'FRONT', owner: 'PLAYERTWO' },
+    });
+
+    const result = GameRules.findAttackTarget(action, board);
+
+    expect(result).toBeDefined();
+    expect(result?.lane).toBe(2);
+    expect(result?.owner).toBe('PLAYERTWO');
+  });
+
+  it('deve retornar undefined se targetSlot não existir na action', () => {
+    const board = makeBoard([]);
+    const action = makeAction({ targetSlot: undefined });
+
+    const result = GameRules.findAttackTarget(action, board);
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('GameRules.attackHasInRange', () => {
+  const rangeCard = (range: number) =>
+    makeCard({
+      base: { id: 'b1', evolvesFromId: null, range } as GameCard,
+    });
+
+  it('deve permitir ataque frontal same lane (range 1)', () => {
+    const attacker = rangeCard(1);
+    const board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: attacker },
+      { lane: 0, position: 'FRONT', owner: 'PLAYERTWO', cardInstance: makeCard({ instanceId: 't1' }) },
+    ]);
+    const action = makeAction({
+      cardInstance: attacker,
+      owner: 'PLAYERONE',
+      targetSlot: { lane: 0, position: 'FRONT', owner: 'PLAYERTWO' },
+    });
+
+    expect(GameRules.attackHasInRange(action, board)).toBe(true);
+  });
+
+  it('deve bloquear ataque de range 1 para target BACK (range insuficiente)', () => {
+    const attacker = rangeCard(1);
+    const board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: attacker },
+      { lane: 0, position: 'BACK', owner: 'PLAYERTWO', cardInstance: makeCard({ instanceId: 't1' }) },
+    ]);
+    const action = makeAction({
+      cardInstance: attacker,
+      owner: 'PLAYERONE',
+      targetSlot: { lane: 0, position: 'BACK', owner: 'PLAYERTWO' },
+    });
+
+    expect(GameRules.attackHasInRange(action, board)).toBe(false);
+  });
+
+  it('deve permitir ataque de range 2 para target BACK same lane', () => {
+    const attacker = rangeCard(2);
+    const board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: attacker },
+      { lane: 0, position: 'BACK', owner: 'PLAYERTWO', cardInstance: makeCard({ instanceId: 't1' }) },
+    ]);
+    const action = makeAction({
+      cardInstance: attacker,
+      owner: 'PLAYERONE',
+      targetSlot: { lane: 0, position: 'BACK', owner: 'PLAYERTWO' },
+    });
+
+    expect(GameRules.attackHasInRange(action, board)).toBe(true);
+  });
+
+  it('deve bloquear ataque cross-lane com range insuficiente', () => {
+    const attacker = rangeCard(1);
+    const board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: attacker },
+      { lane: 2, position: 'FRONT', owner: 'PLAYERTWO', cardInstance: makeCard({ instanceId: 't1' }) },
+    ]);
+    const action = makeAction({
+      cardInstance: attacker,
+      owner: 'PLAYERONE',
+      targetSlot: { lane: 2, position: 'FRONT', owner: 'PLAYERTWO' },
+    });
+
+    // requiredRange = laneDistance(2) + baseCost(1) + targetPenalty(0) = 3
+    expect(GameRules.attackHasInRange(action, board)).toBe(false);
+  });
+
+  it('deve retornar false se atacante não estiver no board', () => {
+    const attacker = rangeCard(5);
+    const board = makeBoard([]);
+    const action = makeAction({
+      cardInstance: attacker,
+      owner: 'PLAYERONE',
+      targetSlot: { lane: 0, position: 'FRONT', owner: 'PLAYERTWO' },
+    });
+
+    expect(GameRules.attackHasInRange(action, board)).toBe(false);
+  });
+});
+
+describe('GameRules.resolveDead', () => {
+  it('deve remover cartas mortas e dar victory point ao oponente', () => {
+    const deadCard = makeCard({
+      instanceId: 'dead-1',
+      status: ['DEAD'],
+      state: { currentLife: 0, currentAttack: 5, currentEnergy: 0, hasAttacked: true, isOnBoard: true, canEvolution: false },
+    });
+    const aliveCard = makeCard({
+      instanceId: 'alive-1',
+      status: [],
+      state: { currentLife: 10, currentAttack: 3, currentEnergy: 0, hasAttacked: true, isOnBoard: true, canEvolution: false },
+    });
+
+    const room = makeRoom([]);
+    room.state.board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: deadCard },
+      { lane: 1, position: 'FRONT', owner: 'PLAYERONE', cardInstance: aliveCard },
+    ]);
+
+    GameRules.resolveDead(room);
+
+    const slot0 = room.state.board.slots.find(
+      (s) => s.lane === 0 && s.position === 'FRONT' && s.owner === 'PLAYERONE',
+    );
+    const slot1 = room.state.board.slots.find(
+      (s) => s.lane === 1 && s.position === 'FRONT' && s.owner === 'PLAYERONE',
+    );
+
+    expect(slot0?.cardInstance).toBeUndefined();
+    expect(room.state.playerTwo.victoryPoints).toBe(1);
+    expect(room.state.playerTwo.graveyard).toContain('dead-1');
+
+    expect(slot1?.cardInstance).toBeDefined();
+    expect(slot1?.cardInstance?.state.hasAttacked).toBe(false);
+  });
+
+  it('deve lidar com múltiplas mortes', () => {
+    const dead1 = makeCard({
+      instanceId: 'dead-1',
+      status: ['DEAD'],
+      state: { currentLife: 0, currentAttack: 5, currentEnergy: 0, hasAttacked: true, isOnBoard: true, canEvolution: false },
+    });
+    const dead2 = makeCard({
+      instanceId: 'dead-2',
+      status: ['DEAD'],
+      state: { currentLife: -3, currentAttack: 2, currentEnergy: 0, hasAttacked: false, isOnBoard: true, canEvolution: false },
+    });
+
+    const room = makeRoom([]);
+    room.state.board = makeBoard([
+      { lane: 0, position: 'FRONT', owner: 'PLAYERONE', cardInstance: dead1 },
+      { lane: 1, position: 'FRONT', owner: 'PLAYERTWO', cardInstance: dead2 },
+    ]);
+
+    GameRules.resolveDead(room);
+
+    expect(room.state.playerTwo.victoryPoints).toBe(1);
+    expect(room.state.playerOne.victoryPoints).toBe(1);
+    expect(room.state.playerTwo.graveyard).toContain('dead-1');
+    expect(room.state.playerOne.graveyard).toContain('dead-2');
   });
 });

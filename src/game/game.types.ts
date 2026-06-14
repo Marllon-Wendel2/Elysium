@@ -52,7 +52,7 @@ export interface BoardSlot {
   lane: number;
   position: Position;
   owner: 'PLAYERONE' | 'PLAYERTWO';
-  cardInstance?: CardInstance;
+  cardInstance?: CardInstance | null;
 }
 
 type Position = 'FRONT' | 'BACK';

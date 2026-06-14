@@ -24,6 +24,7 @@ export function createInstanceOfDeck(deck: {
         isOnBoard: false,
         hasAttacked: false,
         canEvolution: false,
+        currentAttack: c.card.attack ?? 0,
       },
       status: [],
     })),
