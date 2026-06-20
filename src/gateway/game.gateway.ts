@@ -153,8 +153,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log('playerOne', playerOne);
       console.log('playerTwo', playerTwo);
 
-      this.server.to(playerOne.socketId).emit('SLOT_CHOICE');
-      this.server.to(playerTwo.socketId).emit('SLOT_CHOICE');
+      this.server
+        .to(playerOne.socketId)
+        .emit('SLOT_CHOICE', { side: 'PLAYERONE' });
+      this.server
+        .to(playerTwo.socketId)
+        .emit('SLOT_CHOICE', { side: 'PLAYERTWO' });
     }
   }
 
